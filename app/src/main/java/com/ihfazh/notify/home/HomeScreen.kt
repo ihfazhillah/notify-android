@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.*
+import com.ihfazh.notify.destinations.FeedItemDetailDestination
 import com.ihfazh.notify.destinations.LoginScreenDestination
 import com.ihfazh.notify.destinations.RequestPermissionScreenDestination
 import com.ihfazh.notify.request_permission.RequestPermissionScreen
@@ -109,11 +111,14 @@ fun HomeScreen(
                         )
 
                         LazyColumn(
-                            Modifier.fillMaxSize()
+                            Modifier.fillMaxSize(),
+                            state = rememberLazyListState()
                         ) {
                             items(feeds.itemCount){ index ->
                                 feeds[index]?.let { feed ->
-                                    FeedListItem(item = feed, onClick = {})
+                                    FeedListItem(item = feed, onClick = {
+                                        navigator.navigate(FeedItemDetailDestination(feed.id))
+                                    })
                                 }
                             }
                         }

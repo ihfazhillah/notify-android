@@ -23,7 +23,7 @@ data class TagsItem(
 	val pk: Int? = null,
 
 	@Json(name="title")
-	val title: String? = null,
+	val title: String,
 
 	@Json(name="url")
 	val url: String? = null

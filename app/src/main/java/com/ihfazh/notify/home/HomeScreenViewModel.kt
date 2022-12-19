@@ -2,6 +2,7 @@ package com.ihfazh.notify.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.messaging.FirebaseMessaging
@@ -30,6 +31,6 @@ class HomeScreenViewModel(
     val feedItems = feedRepository.getFeedItems().shareIn(
         viewModelScope,
         SharingStarted.Lazily
-    )
+    ).cachedIn(viewModelScope)
 
 }

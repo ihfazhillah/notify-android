@@ -3,8 +3,11 @@ package com.ihfazh.notify.remote
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.ihfazh.notify.common.SourceResult
+import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed.FeedRepository
 import com.ihfazh.notify.feed.SimpleFeedItem
+import com.ihfazh.notify.remote.data.FeedItemResponse
 import com.ihfazh.notify.remote.paging_source.FeedListPagingSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Factory
@@ -19,5 +22,36 @@ class DefaultFeedRepository(
             pagingSourceFactory = { FeedListPagingSource(remote) }
         )
         return pager.flow
+    }
+
+    override suspend fun getFeedItem(id: Int):  SourceResult<FeedItemDetail>{
+        val resp = safeApiRequest {
+            remote.getFeedItem(id)
+        }
+
+        return when(resp){
+            is ApiResult.Error -> {
+                SourceResult.Error(message = resp.message)
+            }
+            is ApiResult.Success -> {
+                SourceResult.Success(FeedItemDetail(resp.data.pk, resp.data.title, resp.data.content, resp.data.tags.map{ it.title }))
+            }
+        }
+
+
+    }
+
+    override suspend fun log(id: Int): SourceResult<Boolean> {
+        val resp = safeApiRequest {
+            remote.logFeedItem(id)
+        }
+        return when(resp){
+            is ApiResult.Error -> {
+                SourceResult.Error(message = resp.message)
+            }
+            is ApiResult.Success -> {
+                SourceResult.Success(true)
+            }
+        }
     }
 }

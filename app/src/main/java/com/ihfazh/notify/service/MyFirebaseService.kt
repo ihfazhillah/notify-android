@@ -17,7 +17,7 @@ import com.ihfazh.notify.MainActivity
 import com.ihfazh.notify.R
 import com.ihfazh.notify.auth.AuthRepository
 import com.ihfazh.notify.common.PreferenceManager
-import com.ihfazh.notify.destinations.ItemDetailDestination
+import com.ihfazh.notify.destinations.FeedItemDetailDestination
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -63,7 +63,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
         val channelId = "job_alert"
 
 //        val uri = ItemDetailDestionas
-        val uri = "https://notify.ihfazh.com/deeplink/${ItemDetailDestination(id=id ?: 10).route}".toUri()
+        val uri = "https://notify.ihfazh.com/deeplink/${FeedItemDetailDestination(id=id ?: 10).route}".toUri()
         val intent = Intent(Intent.ACTION_VIEW, uri, this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
