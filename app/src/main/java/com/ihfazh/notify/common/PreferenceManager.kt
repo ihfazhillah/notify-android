@@ -9,6 +9,7 @@ import org.koin.core.annotation.Single
 class PreferenceManager(context: Context) {
     companion object {
         private const val USER_TOKEN = "user_token"
+        private const val REGISTRATION_ID = "registration_id"
     }
 
     private val prefs = context.getSharedPreferences(
@@ -27,4 +28,12 @@ class PreferenceManager(context: Context) {
         }
     }
 
+    fun setRegistrationId(token: String){
+        prefs.edit {
+            putString(REGISTRATION_ID, token)
+            apply()
+        }
+    }
+
+    fun getRegistrationId(): String? = prefs.getString(REGISTRATION_ID, null)
 }

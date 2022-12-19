@@ -20,35 +20,10 @@ class HomeScreenViewModel(
 ): ViewModel() {
     fun getToken(): String? = preferenceManager.getToken()
 
-    private val _notificationPermissionGranted = MutableStateFlow(false)
-    val notificationPermissionGranted = _notificationPermissionGranted.asStateFlow()
-    fun setNotificationPermissionGranted(value: Boolean){
-        _notificationPermissionGranted.value = value
-    }
-
     private val _notificationPermissionText = MutableStateFlow("")
     val notificationPermissionText = _notificationPermissionText.asStateFlow()
     fun setNotificationPermissionText(value: String){
         _notificationPermissionText.value = value
     }
 
-    fun registerDevice() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-//                Timber.d(TAG, "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-            Timber.d("token : $token")
-            FirebaseInstallations.getInstance().id.addOnSuccessListener { id ->
-                viewModelScope.launch {
-                    repository.registerDevice(id, token)
-                }
-
-            }
-            // Log and toast
-        })
-    }
 }

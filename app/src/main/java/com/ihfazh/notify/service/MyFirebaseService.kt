@@ -16,6 +16,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.ihfazh.notify.MainActivity
 import com.ihfazh.notify.R
 import com.ihfazh.notify.auth.AuthRepository
+import com.ihfazh.notify.common.PreferenceManager
 import com.ihfazh.notify.destinations.ItemDetailDestination
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
@@ -25,7 +26,9 @@ import timber.log.Timber
 class MyFirebaseService(): FirebaseMessagingService() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
+
     private val authRepository : AuthRepository by inject()
+    private val preferenceManager: PreferenceManager by inject()
 
 
     override fun onNewToken(token: String) {
@@ -33,7 +36,8 @@ class MyFirebaseService(): FirebaseMessagingService() {
         scope.launch {
             FirebaseInstallations.getInstance().id.addOnSuccessListener { id ->
                 scope.launch {
-                    authRepository.registerDevice(id, token)
+                    if (authRepository.getToken() != null) authRepository.registerDevice(id, token)
+                    else preferenceManager.setRegistrationId(token)
                 }
             }
         }
@@ -66,7 +70,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
 //        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
         }
 
 

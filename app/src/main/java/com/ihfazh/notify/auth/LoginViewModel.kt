@@ -41,8 +41,12 @@ class LoginViewModel(
                     }
                 }
                 is LoginStatus.Success -> {
+                    preferenceManager.setToken(resp.token)
+                    val firebaseRegistrationId = preferenceManager.getRegistrationId()
+                    repository.registerDevice("", firebaseRegistrationId!!)
+
                     withContext(Dispatchers.Main){
-                        preferenceManager.setToken(resp.token)
+
                         listener.invoke(true)
                     }
                 }
