@@ -4,6 +4,7 @@ import com.ihfazh.notify.auth.AuthRepository
 import com.ihfazh.notify.auth.LoginStatus
 import com.ihfazh.notify.common.PreferenceManager
 import com.ihfazh.notify.remote.data.GetTokenBody
+import com.ihfazh.notify.remote.data.RegisterDeviceBody
 import org.koin.core.annotation.Factory
 
 @Factory
@@ -23,6 +24,18 @@ class DefaultAuthRepository(
         return when(resp){
             is ApiResult.Error -> LoginStatus.Error
             is ApiResult.Success -> LoginStatus.Success(resp.data.token)
+        }
+    }
+
+    override suspend fun registerDevice(deviceId: String, token: String) {
+        val resp = safeApiRequest {
+            api.registerDevice(
+                RegisterDeviceBody(
+                    deviceId,
+                    "android-$deviceId",
+                    token
+                )
+            )
         }
     }
 }
