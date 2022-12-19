@@ -1,11 +1,10 @@
 package com.ihfazh.notify.remote
 
-import com.ihfazh.notify.remote.data.GetTokenBody
-import com.ihfazh.notify.remote.data.GetTokenResponse
-import com.ihfazh.notify.remote.data.RegisterDeviceBody
-import com.ihfazh.notify.remote.data.RegisterDeviceResponse
+import com.ihfazh.notify.remote.data.*
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface NotifyService {
     @POST("auth-token/")
@@ -13,4 +12,7 @@ interface NotifyService {
 
     @POST("api/devices/")
     suspend fun registerDevice(@Body body: RegisterDeviceBody): RegisterDeviceResponse
+
+    @GET("api/feed-items/")
+    suspend fun getFeedItems(@Query("page")  page: Int): FeedListResponse
 }

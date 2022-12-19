@@ -5,20 +5,27 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.*
 import com.ihfazh.notify.destinations.LoginScreenDestination
 import com.ihfazh.notify.destinations.RequestPermissionScreenDestination
 import com.ihfazh.notify.request_permission.RequestPermissionScreen
+import com.ihfazh.notify.ui.component.FeedListItem
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -78,6 +85,8 @@ fun HomeScreen(
         }
     }
 
+    val feeds = homeScreenViewModel.feedItems.collectAsLazyPagingItems()
+
 
     NotifyTheme {
         Scaffold(
@@ -89,8 +98,26 @@ fun HomeScreen(
             },
             content = {
                 NotifyTheme {
-                    Column {
-                        Text("Hello world")
+                    Column (
+                    ){
+                        Text(
+                            text = "Your Feeds",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(16.dp)
+                        )
+
+                        LazyColumn(
+                            Modifier.fillMaxSize()
+                        ) {
+                            items(feeds.itemCount){ index ->
+                                feeds[index]?.let { feed ->
+                                    FeedListItem(item = feed, onClick = {})
+                                }
+                            }
+                        }
+
                     }
 
                 }

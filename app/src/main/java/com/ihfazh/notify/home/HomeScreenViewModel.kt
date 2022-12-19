@@ -7,8 +7,8 @@ import com.google.firebase.installations.FirebaseInstallations
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ihfazh.notify.auth.AuthRepository
 import com.ihfazh.notify.common.PreferenceManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.ihfazh.notify.feed.FeedRepository
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import timber.log.Timber
@@ -17,13 +17,19 @@ import timber.log.Timber
 class HomeScreenViewModel(
     private val preferenceManager: PreferenceManager,
     private val repository: AuthRepository,
+    private val feedRepository: FeedRepository,
 ): ViewModel() {
     fun getToken(): String? = preferenceManager.getToken()
 
-    private val _notificationPermissionText = MutableStateFlow("")
-    val notificationPermissionText = _notificationPermissionText.asStateFlow()
-    fun setNotificationPermissionText(value: String){
-        _notificationPermissionText.value = value
-    }
+//    private val _notificationPermissionText = MutableStateFlow("")
+//    val notificationPermissionText = _notificationPermissionText.asStateFlow()
+//    fun setNotificationPermissionText(value: String){
+//        _notificationPermissionText.value = value
+//    }
+
+    val feedItems = feedRepository.getFeedItems().shareIn(
+        viewModelScope,
+        SharingStarted.Lazily
+    )
 
 }
