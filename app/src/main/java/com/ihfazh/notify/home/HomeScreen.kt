@@ -4,23 +4,28 @@ import android.Manifest
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.*
 import com.ihfazh.notify.destinations.FeedItemDetailDestination
@@ -34,6 +39,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.getViewModel
 import timber.log.Timber
 
@@ -46,7 +52,9 @@ fun HandleTiramisuNotificationPermission(viewModel: HomeScreenViewModel){
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+    ExperimentalMaterialApi::class
+)
 @RootNavGraph(start=true)
 @Destination()
 @Composable
@@ -87,7 +95,24 @@ fun HomeScreen(
         }
     }
 
+
     val feeds = homeScreenViewModel.feedItems.collectAsLazyPagingItems()
+    var refreshing by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(feeds.loadState.source){
+        val isLoading = listOf(
+            feeds.loadState.source.refresh is LoadState.Loading,
+            feeds.loadState.source.prepend is LoadState.Loading,
+            feeds.loadState.source.append is LoadState.Loading,
+        ).any { it }
+        refreshing = isLoading
+    }
+
+    val refreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = {feeds.refresh()})
+
+
 
 
     NotifyTheme {
@@ -100,28 +125,37 @@ fun HomeScreen(
             },
             content = {
                 NotifyTheme {
-                    Column (
-                    ){
-                        Text(
-                            text = "Your Feeds",
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                            fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .pullRefresh(refreshState)){
+                        Column (
+                        ){
+                            Text(
+                                text = "Your Feeds",
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(16.dp)
+                            )
 
-                        LazyColumn(
-                            Modifier.fillMaxSize(),
-                            state = rememberLazyListState()
-                        ) {
-                            items(feeds.itemCount){ index ->
-                                feeds[index]?.let { feed ->
-                                    FeedListItem(item = feed, onClick = {
-                                        navigator.navigate(FeedItemDetailDestination(feed.id))
-                                    })
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxSize()
+                                ,
+                                state = rememberLazyListState()
+                            ) {
+                                items(feeds.itemCount){ index ->
+                                    feeds[index]?.let { feed ->
+                                        FeedListItem(item = feed, isRead = feed.accessed, onClick = {
+                                            navigator.navigate(FeedItemDetailDestination(feed.id))
+                                        })
+                                    }
                                 }
                             }
+
                         }
+
+                        PullRefreshIndicator(refreshing, refreshState, Modifier.align(Alignment.TopCenter))
 
                     }
 

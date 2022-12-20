@@ -29,7 +29,7 @@ class FeedListPagingSource(
             }
             is ApiResult.Success -> {
                 LoadResult.Page(
-                    response.data.results.map{SimpleFeedItem(it.pk, it.title)},
+                    response.data.results.map{SimpleFeedItem(it.pk, it.title, it.accessed)},
                     prevKey = if (response.data.previous != null) nextPageNumber - 1 else null,
                     nextKey = if (response.data.next != null) nextPageNumber + 1 else null,
                 )
