@@ -1,8 +1,10 @@
 package com.ihfazh.notify.home
 
 import android.Manifest
+import android.app.Activity
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import timber.log.Timber
 
@@ -111,8 +114,21 @@ fun HomeScreen(
     }
 
     val refreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = {feeds.refresh()})
+    val listState = rememberLazyListState()
 
+    val scope = rememberCoroutineScope()
 
+    val activity = (LocalContext.current as? Activity)
+
+    BackHandler {
+        if (listState.firstVisibleItemIndex >= 1) {
+            scope.launch {
+                listState.scrollToItem(0)
+            }
+        } else {
+            activity?.finish()
+        }
+    }
 
 
     NotifyTheme {
@@ -142,7 +158,7 @@ fun HomeScreen(
                                 Modifier
                                     .fillMaxSize()
                                 ,
-                                state = rememberLazyListState()
+                                state = listState
                             ) {
                                 items(feeds.itemCount){ index ->
                                     feeds[index]?.let { feed ->
