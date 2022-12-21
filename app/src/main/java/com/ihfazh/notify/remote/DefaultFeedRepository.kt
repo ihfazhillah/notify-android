@@ -34,7 +34,18 @@ class DefaultFeedRepository(
                 SourceResult.Error(message = resp.message)
             }
             is ApiResult.Success -> {
-                SourceResult.Success(FeedItemDetail(resp.data.pk, resp.data.title, resp.data.content, resp.data.tags.map{ it.title }))
+                SourceResult.Success(FeedItemDetail(
+                    resp.data.pk,
+                    resp.data.title,
+                    resp.data.tags.map { it.title },
+                    resp.data.description,
+                    resp.data.category,
+                    resp.data.country,
+                    resp.data.proposal_example_text,
+                    resp.data.skills,
+                    resp.data.budget,
+                    resp.data.hourly_range
+                ))
             }
         }
 

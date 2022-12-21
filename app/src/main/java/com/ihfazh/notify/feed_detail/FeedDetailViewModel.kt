@@ -12,11 +12,11 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 
-sealed class FeedState{
-    object Empty: FeedState()
-    object Loading: FeedState()
-    data class Error(val message: String): FeedState()
-    data class Success(val item: FeedItemDetail): FeedState()
+sealed class FeedState<T>{
+    class Empty<T>: FeedState<T>()
+    class Loading<T>: FeedState<T>()
+    data class Error<T>(val message: String): FeedState<T>()
+    data class Success<T>(val item: FeedItemDetail): FeedState<T>()
 }
 
 @KoinViewModel
@@ -24,7 +24,7 @@ class FeedDetailViewModel(
     private val feedRepository: FeedRepository
 ): ViewModel() {
 
-    private val _feedState : MutableStateFlow<FeedState> = MutableStateFlow(FeedState.Empty)
+    private val _feedState : MutableStateFlow<FeedState<FeedItemDetail>> = MutableStateFlow(FeedState.Empty())
     val feedState = _feedState.asStateFlow()
 
 
@@ -36,7 +36,7 @@ class FeedDetailViewModel(
     }
 
     fun getFeed(id: Int) {
-        _feedState.value = FeedState.Loading
+        _feedState.value = FeedState.Loading()
         viewModelScope.launch{
             when(val resp = feedRepository.getFeedItem(id)){
                 is SourceResult.Error -> {
