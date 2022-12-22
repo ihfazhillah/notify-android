@@ -128,19 +128,22 @@ fun FeedItemDetail(
                                 fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize
                             )
 
-                            Spacer(Modifier.height(32.dp))
-                            Text(
-                                "Proposal Example",
-                                fontSize = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontSize,
-                                fontWeight = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontWeight,
-                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                            )
-                            Spacer(Modifier.height(16.dp))
-                            Text(
-                                item.proposalExample,
-                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                            )
+                            if (item.proposalExample != null){
+                                Spacer(Modifier.height(60.dp))
+                                Text(
+                                    "Proposal Example",
+                                    fontSize = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontSize,
+                                    fontWeight = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontWeight,
+                                    lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    item.proposalExample,
+                                    fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                    lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                                )
+
+                            }
                         }
                     }
                 }

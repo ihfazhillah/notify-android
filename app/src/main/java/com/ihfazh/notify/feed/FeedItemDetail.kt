@@ -7,7 +7,7 @@ data class FeedItemDetail(
     val description: String,
     val category: String,
     val country: String,
-    val proposalExample: String,
+    val proposalExample: String?,
     val skills: List<String>,
     val budget: Int? = null,
     val hourlyRange: List<Int>? = null

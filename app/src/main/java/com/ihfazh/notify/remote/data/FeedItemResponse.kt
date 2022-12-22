@@ -27,7 +27,7 @@ data class FeedItemResponse(
     val country: String,
 
     @Json(name="proposal_example_text")
-    val proposal_example_text: String,
+    val proposal_example_text: String? = null,
 
     @Json(name="skills")
     val skills: List<String> = emptyList(),
