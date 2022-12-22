@@ -36,6 +36,7 @@ class DefaultFeedRepository(
             is ApiResult.Success -> {
                 SourceResult.Success(FeedItemDetail(
                     resp.data.pk,
+                    resp.data.guid,
                     resp.data.title,
                     resp.data.tags.map { it.title },
                     resp.data.description,

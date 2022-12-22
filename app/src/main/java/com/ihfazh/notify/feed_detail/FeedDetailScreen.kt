@@ -1,6 +1,7 @@
 package com.ihfazh.notify.feed_detail
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,13 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.ihfazh.notify.MainActivity
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed_detail.FeedState.*
 import com.ihfazh.notify.ui.component.HtmlText
@@ -26,6 +30,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.getViewModel
+import timber.log.Timber
+import java.util.regex.Pattern
 
 
 @OptIn(ExperimentalUnitApi::class)
@@ -71,6 +77,7 @@ fun FeedItemDetail(
     }
 
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
 
     NotifyTheme {
@@ -80,7 +87,18 @@ fun FeedItemDetail(
                     title = {Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)},
                     navigationIcon = {
                         IconButton(onClick = { navigator.navigateUp() }) {
-                            Icon(painter = painterResource(id = com.ihfazh.notify.R.drawable.ic_baseline_notifications_24), contentDescription = "Go Back")
+                            Icon(painter = painterResource(id = com.ihfazh.notify.R.drawable.ic_baseline_arrow_back_24), contentDescription = "Go Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            val feedItem = (feedState.value as FeedState.Success).item
+                            Intent(Intent.ACTION_VIEW, feedItem.guid.toUri()).let{
+                                it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                context.startActivity(it)
+                            }
+                        }) {
+                            Icon(painter = painterResource(id = com.ihfazh.notify.R.drawable.ic_baseline_arrow_outward_24), contentDescription = "Open")
                         }
                     }
                 )

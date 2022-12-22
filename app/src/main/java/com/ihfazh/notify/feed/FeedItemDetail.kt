@@ -2,6 +2,7 @@ package com.ihfazh.notify.feed
 
 data class FeedItemDetail(
     val id: Int,
+    val guid: String,
     val title: String,
     val tags: List<String> = emptyList(),
     val description: String,
