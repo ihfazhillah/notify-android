@@ -51,7 +51,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
         val id = remoteMessage.data["id"]
         val title = remoteMessage.data["title"]
         val guid = remoteMessage.data["guid"]
-        showNotification(title, "Job Alert: $title}", id?.toInt())
+        showNotification("Job Alert", "$title", id?.toInt())
 
 //        if (remoteMessage.notification != null) {
 //            showNotification(remoteMessage.notification?.title, remoteMessage.notification?.body)
