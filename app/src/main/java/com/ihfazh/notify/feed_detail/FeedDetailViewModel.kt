@@ -1,6 +1,7 @@
 package com.ihfazh.notify.feed_detail
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ihfazh.notify.common.SourceResult
@@ -47,5 +48,11 @@ class FeedDetailViewModel(
                 }
             }
         }
+    }
+
+    private val _example = MutableStateFlow("")
+    val example = _example.asStateFlow()
+    fun setExample(value: String){
+        _example.value = value
     }
 }
