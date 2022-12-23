@@ -41,6 +41,10 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".service.MarkAsReadBroadcastReceiver"
+            android:exported="false"
+            />
+
     </application>
 
 </manifest>

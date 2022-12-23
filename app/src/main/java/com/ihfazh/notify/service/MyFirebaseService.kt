@@ -51,7 +51,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
         val id = remoteMessage.data["id"]
         val title = remoteMessage.data["title"]
         val guid = remoteMessage.data["guid"]
-        showNotification("Job Alert", "$title", id?.toInt())
+        showNotification("Job Alert", "$title", id?.toInt(), guid)
 
 //        if (remoteMessage.notification != null) {
 //            showNotification(remoteMessage.notification?.title, remoteMessage.notification?.body)
@@ -59,7 +59,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
     }
 
     @SuppressLint("ServiceCast")
-    private fun showNotification(title: String?, body: String?, id: Int? = null) {
+    private fun showNotification(title: String?, body: String?, id: Int? = null, guid: String?) {
         val channelId = "job_alert"
 
 //        val uri = ItemDetailDestionas
@@ -73,6 +73,32 @@ class MyFirebaseService(): FirebaseMessagingService() {
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
         }
 
+        // mark as read
+        val markAsReadIntent = Intent(this, MarkAsReadBroadcastReceiver::class.java).apply {
+            action = "mark-as-read"
+            Timber.d("id from notification: $id")
+            putExtra(MarkAsReadBroadcastReceiver.ITEM_ID_KEY, id ?: 10)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        val markAsReadPendingIntent = PendingIntent.getBroadcast(
+            this,
+            id ?: 0,
+            markAsReadIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val openDirectly = Intent(
+            Intent.ACTION_VIEW,
+            guid?.toUri()
+        ).apply {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
+        val openDirectlyPendingIntent = TaskStackBuilder.create(this).run{
+            addNextIntentWithParentStack(openDirectly)
+            getPendingIntent(1, PendingIntent.FLAG_IMMUTABLE)
+        }
+
 
 //        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -81,6 +107,12 @@ class MyFirebaseService(): FirebaseMessagingService() {
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .addAction(
+                R.drawable.ic_baseline_check_24, "Mark As Read", markAsReadPendingIntent
+            )
+            .addAction(
+                R.drawable.ic_baseline_arrow_outward_24, "Open Directly", openDirectlyPendingIntent
+            )
 //            .setSound(soundUri)
             .setContentIntent(pendingIntent)
 

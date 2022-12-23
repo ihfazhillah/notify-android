@@ -1,5 +1,6 @@
 package com.ihfazh.notify
 
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.ihfazh.notify.service.MarkAsReadBroadcastReceiver
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
@@ -17,8 +20,11 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class MainActivity : ComponentActivity() {
+    private val markAsReadReceiver = MarkAsReadBroadcastReceiver()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LocalBroadcastManager.getInstance(this).registerReceiver(markAsReadReceiver, IntentFilter("mark-as-read"))
         setContent {
             NotifyTheme {
                 // A surface container using the 'background' color from the theme
@@ -30,5 +36,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(markAsReadReceiver)
     }
 }
