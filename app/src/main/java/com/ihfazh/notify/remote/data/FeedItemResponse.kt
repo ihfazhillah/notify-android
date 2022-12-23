@@ -21,10 +21,10 @@ data class FeedItemResponse(
     val description: String,
 
     @Json(name="category")
-    val category: String,
+    val category: String?,
 
     @Json(name="country")
-    val country: String,
+    val country: String?,
 
     @Json(name="proposal_example_text")
     val proposal_example_text: String? = null,
