@@ -27,6 +27,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ihfazh.notify.NavGraphs
 import com.ihfazh.notify.destinations.HomeScreenDestination
+import com.ihfazh.notify.destinations.PromptCreateScreenDestination
 import com.ihfazh.notify.ui.component.BottomBar
 import com.ihfazh.notify.ui.component.PromptListItem
 import com.ihfazh.notify.ui.theme.NotifyTheme
@@ -92,7 +93,9 @@ fun PromptScreen(
             FloatingActionButton(
                 containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
-                onClick = { /*TODO*/ }
+                onClick = {
+                    navigator.navigate(PromptCreateScreenDestination)
+                }
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
