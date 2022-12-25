@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -26,21 +27,26 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.permissions.*
+import com.ihfazh.notify.NavGraphs
 import com.ihfazh.notify.destinations.FeedItemDetailDestination
 import com.ihfazh.notify.destinations.LoginScreenDestination
 import com.ihfazh.notify.destinations.RequestPermissionScreenDestination
 import com.ihfazh.notify.request_permission.RequestPermissionScreen
+import com.ihfazh.notify.ui.component.BottomBar
 import com.ihfazh.notify.ui.component.FeedListItem
 import com.ihfazh.notify.ui.theme.NotifyTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.NavResult
 import com.ramcosta.composedestinations.result.ResultRecipient
+import com.ramcosta.composedestinations.utils.navGraph
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -129,17 +135,21 @@ fun HomeScreen(
             activity?.finish()
         }
     }
+    
+    val navController = rememberNavController()
 
 
     NotifyTheme {
         Scaffold(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             topBar = {
-                TopAppBar(contentColor = MaterialTheme.colorScheme.onPrimary) {
-                    Text("Notify")
-                }
+                TopAppBar(contentColor = MaterialTheme.colorScheme.onPrimary, title = {Text("Notify")})
+            },
+            bottomBar = {
+                BottomBar(navController, navigator)
             },
             content = {
+//                DestinationsNavHost(navGraph = NavGraphs.root, navController = navController)
                 NotifyTheme {
                     Box(modifier = Modifier
                         .fillMaxSize()
@@ -172,7 +182,6 @@ fun HomeScreen(
                         }
 
                         PullRefreshIndicator(refreshing, refreshState, Modifier.align(Alignment.TopCenter))
-
                     }
 
                 }

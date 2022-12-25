@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat
 import com.ihfazh.notify.feed.SimpleFeedItem
+import com.ihfazh.notify.prompt.ProposalPrompt
 
 @Composable
 fun FeedListItem(
@@ -39,6 +40,13 @@ fun FeedListItem(
             if (isRead) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary
         )
     }
+}
+
+@Composable
+fun PromptListItem(
+    prompt: ProposalPrompt
+){
+    Text(prompt.label)
 }
 
 @Composable
