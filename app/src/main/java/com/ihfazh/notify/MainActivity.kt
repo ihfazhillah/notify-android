@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.compose.rememberNavController
+import com.ihfazh.notify.destinations.HomeScreenDestination
+import com.ihfazh.notify.destinations.PromptScreenDestination
 import com.ihfazh.notify.service.MarkAsReadBroadcastReceiver
 import com.ihfazh.notify.ui.component.BottomBar
 import com.ihfazh.notify.ui.theme.NotifyTheme
@@ -27,21 +29,43 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         LocalBroadcastManager.getInstance(this).registerReceiver(markAsReadReceiver, IntentFilter("mark-as-read"))
         setContent {
-            val navController = rememberNavController()
-            NotifyTheme {
-                // A surface container using the 'background' color from the theme
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        DestinationsNavHost(navGraph = NavGraphs.root, navController = navController)
-                    }
-            }
+            NotifyApp()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(markAsReadReceiver)
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotifyApp(
+){
+    val navController = rememberNavController()
+    val destination = navController.appCurrentDestinationAsState().value
+        ?: NavGraphs.root.startRoute
+
+    NotifyTheme {
+        // A surface container using the 'background' color from the theme
+        Scaffold(
+            bottomBar = {
+                if (destination in listOf(
+                        HomeScreenDestination,
+                        PromptScreenDestination
+                    )){
+                    BottomBar(navController = navController)
+                }
+            }
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                DestinationsNavHost(navGraph = NavGraphs.root, navController = navController)
+            }
+        }
     }
 }

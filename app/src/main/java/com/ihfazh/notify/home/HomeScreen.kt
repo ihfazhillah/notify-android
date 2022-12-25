@@ -145,9 +145,6 @@ fun HomeScreen(
             topBar = {
                 TopAppBar(contentColor = MaterialTheme.colorScheme.onPrimary, title = {Text("Notify")})
             },
-            bottomBar = {
-                BottomBar(navController, navigator)
-            },
             content = {
 //                DestinationsNavHost(navGraph = NavGraphs.root, navController = navController)
                 NotifyTheme {

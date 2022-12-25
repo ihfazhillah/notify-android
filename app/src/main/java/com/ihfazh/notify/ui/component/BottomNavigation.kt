@@ -37,7 +37,6 @@ enum class BottomBarDestination(
 @Composable
 fun BottomBar(
     navController: NavController,
-    navigator: DestinationsNavigator
 ){
     val currentDestination: Destination = navController.appCurrentDestinationAsState().value
         ?: NavGraphs.root.startAppDestination
@@ -47,7 +46,8 @@ fun BottomBar(
             BottomNavigationItem(
                 selected = currentDestination == destination.direction,
                 onClick = {
-                    navigator.navigate(destination.direction)
+                    navController.navigate(destination.direction){
+                    }
                 },
                 icon = { Icon(destination.icon, contentDescription = destination.label)},
                 label = { Text(destination.label) },
