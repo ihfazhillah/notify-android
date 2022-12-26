@@ -2,12 +2,12 @@ package com.ihfazh.notify.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +46,25 @@ fun FeedListItem(
 fun PromptListItem(
     prompt: ProposalPrompt
 ){
-    Text(prompt.label)
+    val expanded = remember {
+        mutableStateOf(false)
+    }
+    Column(
+        Modifier
+            .padding(16.dp)
+            .clickable {
+                expanded.value = !expanded.value
+            }
+    ){
+        val active = if (prompt.selected) "Selected" else "Not Selected"
+        Text(prompt.label, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+        Text(active, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+
+        if (expanded.value){
+            Spacer(Modifier.height(8.dp))
+            Text(prompt.text, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+        }
+    }
 }
 
 @Composable
