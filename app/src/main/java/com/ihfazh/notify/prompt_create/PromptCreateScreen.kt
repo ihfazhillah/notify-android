@@ -38,6 +38,10 @@ fun PromptCreateScreen(
     val label = promptCreateViewModel.label.collectAsState()
     val selected = promptCreateViewModel.selected.collectAsState()
 
+    // errors
+    val textError = promptCreateViewModel.textError.collectAsState()
+    val labelError = promptCreateViewModel.labelError.collectAsState()
+
     NotifyTheme {
         Scaffold(
             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -52,6 +56,9 @@ fun PromptCreateScreen(
                     },
                     actions = {
                         IconButton(onClick = {
+                            if (promptCreateViewModel.validate()){
+
+                            }
                             // validate first
                             // if any error display
                             // if success navigate back (don't back, just navigate)
@@ -80,8 +87,17 @@ fun PromptCreateScreen(
                                 textColor = MaterialTheme.colorScheme.onBackground,
                                 backgroundColor = MaterialTheme.colorScheme.background
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            isError = labelError.value.isNotEmpty()
                         )
+                        if (labelError.value.isNotEmpty()){
+                            Text(
+                                labelError.value,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -94,10 +110,19 @@ fun PromptCreateScreen(
                                 textColor = MaterialTheme.colorScheme.onBackground,
                                 backgroundColor = MaterialTheme.colorScheme.background
                             ),
+                            isError = textError.value.isNotEmpty(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp),
                         )
+                        if (textError.value.isNotEmpty()){
+                            Text(
+                                textError.value,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 

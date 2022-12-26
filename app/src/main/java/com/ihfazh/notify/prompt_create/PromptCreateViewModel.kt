@@ -13,11 +13,18 @@ class PromptCreateViewModel: ViewModel() {
         _label.value = value
     }
 
+    private val _labelError = MutableStateFlow("")
+    val labelError = _labelError.asStateFlow()
+
+
     private val _text = MutableStateFlow("")
     val text = _text.asStateFlow()
     fun setText(value: String){
         _text.value = value
     }
+
+    private val _textError = MutableStateFlow("")
+    val textError = _textError.asStateFlow()
 
     private val _selected = MutableStateFlow(false)
     val selected = _selected.asStateFlow()
@@ -26,7 +33,19 @@ class PromptCreateViewModel: ViewModel() {
     }
 
     fun validate(): Boolean{
-        return false
+        var valid = true
+
+        if (text.value.isEmpty()){
+            _textError.value = "The prompt text cannot be empty."
+            valid = false
+        }
+
+        if (label.value.isEmpty()){
+            _labelError.value = "The prompt label cannot be empty."
+            valid = false
+        }
+
+        return valid
     }
 
     fun submit(){
