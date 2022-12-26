@@ -30,3 +30,14 @@ data class ProposalPromptItemResponse(
     @Json(name="selected")
     val selected: Boolean = false,
 )
+
+data class ProposalPromptCreateBody(
+    @Json(name="label")
+    val label: String,
+
+    @Json(name="text")
+    val text: String,
+
+    @Json(name="selected")
+    val selected: Boolean = false,
+)

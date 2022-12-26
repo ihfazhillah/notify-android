@@ -16,15 +16,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.ihfazh.notify.destinations.PromptScreenDestination
+import com.ihfazh.notify.prompt_screen.PromptScreen
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.popUpTo
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,6 +46,10 @@ fun PromptCreateScreen(
     val textError = promptCreateViewModel.textError.collectAsState()
     val labelError = promptCreateViewModel.labelError.collectAsState()
 
+    val globalError = remember {
+        mutableStateOf("")
+    }
+
     NotifyTheme {
         Scaffold(
             contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -57,11 +65,16 @@ fun PromptCreateScreen(
                     actions = {
                         IconButton(onClick = {
                             if (promptCreateViewModel.validate()){
-
+                                promptCreateViewModel.submit {
+                                    if (it){
+                                        navigator.navigate(PromptScreenDestination){
+                                            popUpTo(PromptScreenDestination)
+                                        }
+                                    } else {
+                                        globalError.value = "Saving data into server error. Please Try again."
+                                    }
+                                }
                             }
-                            // validate first
-                            // if any error display
-                            // if success navigate back (don't back, just navigate)
                         }) {
                             Icon(imageVector = Icons.Default.Done, "done")
                         }
@@ -76,6 +89,16 @@ fun PromptCreateScreen(
                             .fillMaxSize()
                             .padding(16.dp)
                     ) {
+
+                        if (globalError.value.isNotEmpty()){
+                            Text(
+                                globalError.value,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
 
                         OutlinedTextField(
                             value = label.value,

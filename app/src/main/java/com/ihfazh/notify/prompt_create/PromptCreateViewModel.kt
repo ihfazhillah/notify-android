@@ -1,12 +1,19 @@
 package com.ihfazh.notify.prompt_create
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ihfazh.notify.prompt.PromptRepository
+import com.ihfazh.notify.prompt.ProposalPrompt
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class PromptCreateViewModel: ViewModel() {
+class PromptCreateViewModel(
+    private val promptRepository: PromptRepository
+): ViewModel() {
     private val _label = MutableStateFlow("")
     val label = _label.asStateFlow()
     fun setLabel(value: String){
@@ -48,8 +55,21 @@ class PromptCreateViewModel: ViewModel() {
         return valid
     }
 
-    fun submit(){
+    fun submit(next: (Boolean) -> Unit){
+        viewModelScope.launch {
+            val body = ProposalPrompt(
+                -1,
+                label.value,
+                text.value,
+                selected.value
+            )
 
+            val res = promptRepository.postProposalPrompt(body)
+
+            with(Dispatchers.Main){
+                next.invoke(res)
+            }
+        }
     }
 
 }

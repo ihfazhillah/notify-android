@@ -1,5 +1,6 @@
 package com.ihfazh.notify.remote
 
+import com.ihfazh.notify.prompt.ProposalPrompt
 import com.ihfazh.notify.remote.data.*
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -27,4 +28,9 @@ interface NotifyService {
     suspend fun getProposalPrompts(
         @Query("page") page: Int
     ): ProposalPromptListResponse
+
+    @POST("api/proposal-prompts/")
+    suspend fun postProposalPrompt(
+        @Body body: ProposalPromptCreateBody
+    ): ProposalPromptItemResponse
 }
