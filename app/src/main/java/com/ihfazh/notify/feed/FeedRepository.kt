@@ -8,4 +8,5 @@ interface FeedRepository {
     fun getFeedItems(): Flow<PagingData<SimpleFeedItem>>
     suspend fun getFeedItem(id: Int): SourceResult<FeedItemDetail>
     suspend fun log(id: Int): SourceResult<Boolean>
+    suspend fun reloadProposalExample(id: Int): SourceResult<String>
 }

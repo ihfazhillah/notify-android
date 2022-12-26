@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -105,6 +108,8 @@ fun FeedItemDetail(
 
     val example = feedItemViewModel.example.collectAsState()
 
+    val loading = feedItemViewModel.proposalLoading.collectAsState()
+
 
     NotifyTheme {
         Scaffold(
@@ -135,6 +140,16 @@ fun FeedItemDetail(
                         }
                     }
                 )
+            },
+            floatingActionButton = {
+                if (pagerState.currentPage == 1){
+                    // in the proposal page
+                    androidx.compose.material3.FloatingActionButton(onClick = {
+                        feedItemViewModel.loadProposal(id)
+                    }) {
+                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
+                    }
+                }
             },
             content = {
                 when(feedState.value){
@@ -184,7 +199,7 @@ fun FeedItemDetail(
                                 if (it == 0){
                                     JobDescriptionContent(feedItem = resp.item)
                                 } else {
-                                    ProposalExampleContent(example.value){ value ->
+                                    ProposalExampleContent(example.value, loading=loading.value){ value ->
                                         feedItemViewModel.setExample(value)
                                     }
                                 }
@@ -200,32 +215,39 @@ fun FeedItemDetail(
 
 @Composable
 @OptIn(ExperimentalUnitApi::class)
-private fun ProposalExampleContent(example: String, onValueChange: (String) -> Unit) {
+private fun ProposalExampleContent(example: String, loading: Boolean = false, onValueChange: (String) -> Unit) {
     val scrollState = rememberScrollState()
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-    ) {
-        if (example.isNotEmpty()) {
+    Box(Modifier.fillMaxSize()){
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
+            if (example.isNotEmpty()) {
 //            Text(
 //                feedItem.proposalExample.trim(),
 //                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
 //                lineHeight = TextUnit(1.5f, TextUnitType.Em)
 //            )
-            TextField(
-                value = example,
-                onValueChange = onValueChange,
-                textStyle=androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                colors=TextFieldDefaults.textFieldColors(
-                    backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
-                    textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
-                ),
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+                TextField(
+                    value = example,
+                    onValueChange = onValueChange,
+                    textStyle=androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                    colors=TextFieldDefaults.textFieldColors(
+                        backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
+                        textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
 
+            }
+        }
+        if (loading){
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }

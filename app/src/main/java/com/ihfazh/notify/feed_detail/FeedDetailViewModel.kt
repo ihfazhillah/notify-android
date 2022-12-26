@@ -55,4 +55,22 @@ class FeedDetailViewModel(
     fun setExample(value: String){
         _example.value = value
     }
+
+    // proposal screen
+    private val _proposalLoading = MutableStateFlow(false)
+    val proposalLoading = _proposalLoading.asStateFlow()
+
+    fun loadProposal(id: Int){
+        _proposalLoading.value = true
+        viewModelScope.launch {
+
+            when(val resp = feedRepository.reloadProposalExample(id)){
+                is SourceResult.Error -> setExample("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
+                is SourceResult.Success -> setExample(resp.data.trim())
+            }
+
+            _proposalLoading.value = false
+        }
+
+    }
 }

@@ -24,6 +24,9 @@ interface NotifyService {
     @GET("api/feed-items/{id}/log_access/")
     suspend fun logFeedItem(@Path("id") id: Int)
 
+    @POST("api/feed-items/{id}/generate_proposal/")
+    suspend fun generateProposal(@Path("id") id: Int): GenerateProposalResponse
+
     @GET("api/proposal-prompts/")
     suspend fun getProposalPrompts(
         @Query("page") page: Int

@@ -66,4 +66,15 @@ class DefaultFeedRepository(
             }
         }
     }
+
+    override suspend fun reloadProposalExample(id: Int): SourceResult<String> {
+        val resp = safeApiRequest {
+            remote.generateProposal(id)
+        }
+
+        return when(resp){
+            is ApiResult.Error -> SourceResult.Error("Something bad happen")
+            is ApiResult.Success -> SourceResult.Success(resp.data.proposal)
+        }
+    }
 }
