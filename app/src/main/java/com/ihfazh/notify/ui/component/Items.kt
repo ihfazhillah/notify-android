@@ -3,12 +3,17 @@ package com.ihfazh.notify.ui.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat
@@ -49,20 +54,49 @@ fun PromptListItem(
     val expanded = remember {
         mutableStateOf(false)
     }
+
+    val color = if (prompt.selected){
+        MaterialTheme.colorScheme.primary
+    } else MaterialTheme.colorScheme.background
+
+    val contentColor = if (prompt.selected){
+        MaterialTheme.colorScheme.onPrimary
+    } else MaterialTheme.colorScheme.onBackground
+
+    val caret: Int = if (expanded.value){
+        com.ihfazh.notify.R.drawable.ic_baseline_keyboard_arrow_up_24
+    } else {
+        com.ihfazh.notify.R.drawable.ic_baseline_keyboard_arrow_down_24
+    }
+
     Column(
         Modifier
+            .background(color)
+            .fillMaxWidth()
             .padding(16.dp)
             .clickable {
                 expanded.value = !expanded.value
-            }
+            },
     ){
-        val active = if (prompt.selected) "Selected" else "Not Selected"
-        Text(prompt.label, fontSize = MaterialTheme.typography.titleMedium.fontSize)
-        Text(active, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                prompt.label,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                color = contentColor,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(0.8f),
+                maxLines = 2
+            )
+
+            Icon(painter = painterResource(id = caret), contentDescription = "Toggle")
+        }
 
         if (expanded.value){
             Spacer(Modifier.height(8.dp))
-            Text(prompt.text, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+            Text(prompt.text, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = contentColor)
         }
     }
 }
