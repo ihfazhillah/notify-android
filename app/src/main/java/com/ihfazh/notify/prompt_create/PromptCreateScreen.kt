@@ -14,10 +14,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +42,14 @@ fun PromptCreateScreen(
     // errors
     val textError = promptCreateViewModel.textError.collectAsState()
     val labelError = promptCreateViewModel.labelError.collectAsState()
+
+
+    // preview
+    val previewText = promptCreateViewModel.previewText.collectAsState()
+    val previewLoading = promptCreateViewModel.previewLoading.collectAsState()
+
+    val previewButtonText = if (previewLoading.value) "Generating Preview... " else "Generate Preview"
+
 
     val globalError = remember {
         mutableStateOf("")
@@ -167,6 +172,21 @@ fun PromptCreateScreen(
                             )
                             Spacer(Modifier.width(16.dp))
                             Text(text = "Is Selected?")
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+                        androidx.compose.material3.Button(
+                            onClick = {
+                                promptCreateViewModel.getPreview(text.value)
+                            },
+                            enabled = !previewLoading.value
+                        ) {
+                            Text(previewButtonText)
+                        }
+                        Spacer(Modifier.height(8.dp))
+
+                        if (previewText.value.isNotEmpty()){
+                            Text(previewText.value, fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyMedium.fontStyle)
                         }
 
                     }

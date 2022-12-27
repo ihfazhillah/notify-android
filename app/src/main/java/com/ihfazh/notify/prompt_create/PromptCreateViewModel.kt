@@ -2,6 +2,7 @@ package com.ihfazh.notify.prompt_create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ihfazh.notify.common.SourceResult
 import com.ihfazh.notify.prompt.PromptRepository
 import com.ihfazh.notify.prompt.ProposalPrompt
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +71,37 @@ class PromptCreateViewModel(
                 next.invoke(res)
             }
         }
+    }
+
+    // preview feature
+    private val _previewText = MutableStateFlow("")
+    val previewText = _previewText.asStateFlow()
+
+    private val _previewLoading = MutableStateFlow(false)
+    val previewLoading = _previewLoading.asStateFlow()
+
+    fun getPreview(text: String){
+        _previewLoading.value = true
+
+        viewModelScope.launch{
+            val resp = promptRepository.preview(text)
+
+            when(resp){
+                is SourceResult.Error -> {
+                    _previewText.value = resp.message!!
+                }
+                is SourceResult.Success -> {
+                    val desc = "JobDesc: \n" + resp.data.jobDesc
+                    val preview = "Preview: \n" + resp.data.preview
+
+                    val data = "$desc\n\n$preview"
+                    _previewText.value = data
+                }
+            }
+
+            _previewLoading.value = false
+        }
+
     }
 
 }

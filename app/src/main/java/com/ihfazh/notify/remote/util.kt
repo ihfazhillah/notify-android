@@ -1,5 +1,6 @@
 package com.ihfazh.notify.remote
 import okio.IOException
+import timber.log.Timber
 
 
 enum class ResultStatus {
@@ -35,5 +36,6 @@ suspend fun <T> safeApiRequest(
     } catch (ex: IOException) {
         ApiResult.Error(code = ResultStatus.NetworkException)
     } catch (ex: Exception) {
+        Timber.d(ex)
         ApiResult.Error(code = ResultStatus.GeneralException)
     }
