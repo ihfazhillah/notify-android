@@ -36,6 +36,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.ihfazh.notify.MainActivity
+import com.ihfazh.notify.R
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed_detail.FeedState.*
 import com.ihfazh.notify.ui.component.HtmlText
@@ -132,12 +133,6 @@ fun FeedItemDetail(
                         IconButton(onClick = {
                             val feedItem = (feedState.value as FeedState.Success).item
 
-                            if (feedItem.proposalExample != null){
-                                clipboardManager.setText(AnnotatedString(example.value.trim()))
-                                Toast.makeText(context, "Proposal Example copied into clipboard", Toast.LENGTH_SHORT).show()
-                            }
-
-
                             Intent(Intent.ACTION_VIEW, feedItem.guid.toUri()).let{
                                 it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                                 context.startActivity(it)
@@ -224,20 +219,28 @@ fun FeedItemDetail(
 @OptIn(ExperimentalUnitApi::class)
 private fun ProposalExampleContent(example: String, loading: Boolean = false, onValueChange: (String) -> Unit) {
     val scrollState = rememberScrollState()
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
 
     Box(Modifier.fillMaxSize()){
         Column(
             Modifier
                 .fillMaxSize()
+                .padding(16.dp)
                 .verticalScroll(scrollState)
         ) {
+            Button(onClick = {
+                clipboardManager.setText(AnnotatedString(example))
+                Toast.makeText(context, "Example copied into clipboard", Toast.LENGTH_SHORT).show()
+            }) {
+                Row {
+                    Icon(painter = painterResource(id = R.drawable.ic_baseline_content_copy_24), contentDescription = "COPY")
+                    Text("Copy to Clipboard")
+                }
+            }
+            Spacer(Modifier.height(8.dp))
             if (example.isNotEmpty()) {
-//            Text(
-//                feedItem.proposalExample.trim(),
-//                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-//                lineHeight = TextUnit(1.5f, TextUnitType.Em)
-//            )
-                TextField(
+                OutlinedTextField(
                     value = example,
                     onValueChange = onValueChange,
                     textStyle=androidx.compose.material3.MaterialTheme.typography.bodyLarge,
