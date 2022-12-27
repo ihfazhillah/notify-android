@@ -1,6 +1,8 @@
 package com.ihfazh.notify.feed_detail
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.core.AnimationVector
@@ -24,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
@@ -63,11 +66,16 @@ fun FeedItemDetail(
     navigator: DestinationsNavigator
 ){
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     DisposableEffect(key1 = lifecycleOwner){
         val observer = LifecycleEventObserver{ _, event ->
             if (event == Lifecycle.Event.ON_CREATE){
                 feedItemViewModel.log(id)
                 feedItemViewModel.getFeed(id)
+
+                // additionally: remove from the notification
+                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(id)
             }
         }
 
@@ -99,7 +107,6 @@ fun FeedItemDetail(
             (feedState.value as Success).item.title}
     }
 
-    val context = LocalContext.current
 
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
