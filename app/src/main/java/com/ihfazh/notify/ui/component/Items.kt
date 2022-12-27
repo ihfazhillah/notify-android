@@ -2,23 +2,35 @@ package com.ihfazh.notify.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.rememberSwipeableState
+import androidx.compose.material.swipeable
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat
 import com.ihfazh.notify.feed.SimpleFeedItem
 import com.ihfazh.notify.prompt.ProposalPrompt
+import timber.log.Timber
+import kotlin.math.roundToInt
 
 @Composable
 fun FeedListItem(
@@ -47,9 +59,11 @@ fun FeedListItem(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PromptListItem(
-    prompt: ProposalPrompt
+    prompt: ProposalPrompt,
+    onItemActivate: () -> Unit
 ){
     val expanded = remember {
         mutableStateOf(false)
@@ -68,6 +82,7 @@ fun PromptListItem(
     } else {
         com.ihfazh.notify.R.drawable.ic_baseline_keyboard_arrow_down_24
     }
+
 
     Column(
         Modifier
@@ -91,13 +106,29 @@ fun PromptListItem(
                 maxLines = 2
             )
 
-            Icon(painter = painterResource(id = caret), contentDescription = "Toggle")
+            Icon(
+                painter = painterResource(id = caret),
+                contentDescription = "Toggle",
+                tint = contentColor
+            )
         }
 
         if (expanded.value){
             Spacer(Modifier.height(8.dp))
             Text(prompt.text, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = contentColor)
+            Spacer(Modifier.height(8.dp))
+
+            Row(Modifier.fillMaxWidth()){
+                if (!prompt.selected){
+                    Button(onClick = {
+                        onItemActivate.invoke()
+                    }) {
+                        Text("Activate")
+                    }
+                }
+            }
         }
+
     }
 }
 

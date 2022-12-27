@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface PromptRepository {
     fun getProposalPrompts(): Flow<PagingData<ProposalPrompt>>
     suspend fun postProposalPrompt(body: ProposalPrompt): Boolean
+    suspend fun selectPrompt(id: Int)
 }

@@ -36,4 +36,7 @@ interface NotifyService {
     suspend fun postProposalPrompt(
         @Body body: ProposalPromptCreateBody
     ): ProposalPromptItemResponse
+
+    @POST("api/proposal-prompts/{id}/activate/")
+    suspend fun selectPrompt(@Path("id") id: Int)
 }

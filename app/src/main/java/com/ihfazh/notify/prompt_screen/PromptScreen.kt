@@ -122,7 +122,10 @@ fun PromptScreen(
 
                             items(prompts.itemCount){ index ->
                                 prompts[index]?.let { prompt ->
-                                    PromptListItem(prompt = prompt)
+                                    PromptListItem(prompt = prompt){
+                                        promptViewModel.select(prompt.id)
+                                        prompts.refresh()
+                                    }
                                 }
                             }
                         }

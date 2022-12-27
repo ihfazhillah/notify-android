@@ -35,6 +35,12 @@ class DefaultPromptRepository(
             is ApiResult.Success -> true
         }
     }
+
+    override suspend fun selectPrompt(id: Int) {
+        safeApiRequest {
+            api.selectPrompt(id)
+        }
+    }
 }
 
 private fun ProposalPrompt.asBody(): ProposalPromptCreateBody {

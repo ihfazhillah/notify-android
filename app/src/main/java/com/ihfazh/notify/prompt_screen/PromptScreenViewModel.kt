@@ -9,6 +9,7 @@ import com.ihfazh.notify.feed.FeedRepository
 import com.ihfazh.notify.prompt.PromptRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
@@ -20,5 +21,11 @@ class PromptScreenViewModel(
         viewModelScope,
         SharingStarted.Lazily
     ).cachedIn(viewModelScope)
+
+    fun select(id: Int){
+        viewModelScope.launch {
+            promptRepository.selectPrompt(id)
+        }
+    }
 
 }
