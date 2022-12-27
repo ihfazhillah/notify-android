@@ -128,7 +128,6 @@ fun PromptCreateScreen(
                             value = text.value,
                             onValueChange = { promptCreateViewModel.setText(it) },
                             label = { Text(text = "Text")},
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                             colors = TextFieldDefaults.textFieldColors(
                                 textColor = MaterialTheme.colorScheme.onBackground,
                                 backgroundColor = MaterialTheme.colorScheme.background
