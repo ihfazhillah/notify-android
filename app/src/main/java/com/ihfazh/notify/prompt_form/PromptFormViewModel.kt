@@ -1,4 +1,4 @@
-package com.ihfazh.notify.prompt_create
+package com.ihfazh.notify.prompt_form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
-class PromptCreateViewModel(
+class PromptFormViewModel(
     private val promptRepository: PromptRepository
 ): ViewModel() {
     private val _label = MutableStateFlow("")

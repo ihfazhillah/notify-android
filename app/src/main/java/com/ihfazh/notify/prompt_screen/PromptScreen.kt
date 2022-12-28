@@ -24,7 +24,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ihfazh.notify.NavGraphs
 import com.ihfazh.notify.destinations.HomeScreenDestination
-import com.ihfazh.notify.destinations.PromptCreateScreenDestination
+import com.ihfazh.notify.destinations.PromptFormScreenDestination
 import com.ihfazh.notify.ui.component.BottomBar
 import com.ihfazh.notify.ui.component.PromptListItem
 import com.ihfazh.notify.ui.theme.NotifyTheme
@@ -128,7 +128,7 @@ fun PromptScreen(
                                             prompts.refresh()
                                         },
                                         onItemEdit = {
-                                            navigator.navigate(PromptCreateScreenDestination(it))
+                                            navigator.navigate(PromptFormScreenDestination(it))
                                         }
                                     )
                                 }

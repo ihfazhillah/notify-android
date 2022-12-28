@@ -102,7 +102,7 @@ class MyFirebaseService(): FirebaseMessagingService() {
 
 //        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_baseline_notifications_24)
+            .setSmallIcon(R.drawable.notify_icon)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

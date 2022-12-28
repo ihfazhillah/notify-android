@@ -1,10 +1,6 @@
-package com.ihfazh.notify.prompt_create
+package com.ihfazh.notify.prompt_form
 
-import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,7 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
@@ -33,13 +28,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.ihfazh.notify.destinations.PromptScreenDestination
 import com.ihfazh.notify.prompt.ProposalPrompt
-import com.ihfazh.notify.prompt_screen.PromptScreen
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.popUpTo
-import com.ramcosta.composedestinations.spec.DestinationStyle
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
@@ -48,16 +39,16 @@ import org.koin.androidx.compose.getViewModel
 )
 @Destination
 @Composable
-fun PromptCreateScreen(
+fun PromptFormScreen(
     prompt: ProposalPrompt? = null,
     navigator: DestinationsNavigator,
-    promptCreateViewModel: PromptCreateViewModel = getViewModel()
+    promptFormViewModel: PromptFormViewModel = getViewModel()
 ){
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
 
     if (prompt != null){
-        promptCreateViewModel.setPrompt(prompt)
+        promptFormViewModel.setPrompt(prompt)
     }
 
     val sheetState = rememberModalBottomSheetState(
@@ -86,8 +77,8 @@ fun PromptCreateScreen(
                     },
                     actions = {
                         IconButton(onClick = {
-                            if (promptCreateViewModel.validate()){
-                                promptCreateViewModel.submit {
+                            if (promptFormViewModel.validate()){
+                                promptFormViewModel.submit {
                                     if (it){
                                         navigator.navigate(PromptScreenDestination)
                                     } else {
@@ -107,15 +98,15 @@ fun PromptCreateScreen(
                         sheetState = sheetState,
                         sheetContent = {
                             BottomSheet(
-                                promptCreateViewModel,
+                                promptFormViewModel,
                                 sheetState
                             )
                         },
                         modifier = Modifier
                             .fillMaxSize()
                     ) {
-                        PromptCreateForm(
-                            promptCreateViewModel,
+                        PromptForm(
+                            promptFormViewModel,
                             sheetState,
                             globalError
                         )
@@ -129,23 +120,23 @@ fun PromptCreateScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun PromptCreateForm(
-    promptCreateViewModel: PromptCreateViewModel,
+private fun PromptForm(
+    promptFormViewModel: PromptFormViewModel,
     sheetState: ModalBottomSheetState,
     globalError: MutableState<String>
 ) {
-    val text = promptCreateViewModel.text.collectAsState()
-    val label = promptCreateViewModel.label.collectAsState()
-    val selected = promptCreateViewModel.selected.collectAsState()
+    val text = promptFormViewModel.text.collectAsState()
+    val label = promptFormViewModel.label.collectAsState()
+    val selected = promptFormViewModel.selected.collectAsState()
 
     // errors
-    val textError = promptCreateViewModel.textError.collectAsState()
-    val labelError = promptCreateViewModel.labelError.collectAsState()
+    val textError = promptFormViewModel.textError.collectAsState()
+    val labelError = promptFormViewModel.labelError.collectAsState()
 
 
     // preview
-    val previewText = promptCreateViewModel.previewText.collectAsState()
-    val previewLoading = promptCreateViewModel.previewLoading.collectAsState()
+    val previewText = promptFormViewModel.previewText.collectAsState()
+    val previewLoading = promptFormViewModel.previewLoading.collectAsState()
 
     val previewButtonText = if (previewLoading.value) "Generating Preview... " else "Generate Preview"
 
@@ -168,7 +159,7 @@ private fun PromptCreateForm(
 
         OutlinedTextField(
             value = label.value,
-            onValueChange = { promptCreateViewModel.setLabel(it) },
+            onValueChange = { promptFormViewModel.setLabel(it) },
             label = { Text(text = "Label") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -192,7 +183,7 @@ private fun PromptCreateForm(
 
         OutlinedTextField(
             value = text.value,
-            onValueChange = { promptCreateViewModel.setText(it) },
+            onValueChange = { promptFormViewModel.setText(it) },
             label = { Text(text = "Text") },
             colors = TextFieldDefaults.textFieldColors(
                 textColor = MaterialTheme.colorScheme.onBackground,
@@ -221,7 +212,7 @@ private fun PromptCreateForm(
                     indication = rememberRipple(color = MaterialTheme.colorScheme.primary),
                     interactionSource = remember { MutableInteractionSource() },
                     onClick = {
-                        promptCreateViewModel.setSelected(!selected.value)
+                        promptFormViewModel.setSelected(!selected.value)
                     }
                 )
                 .requiredHeight(ButtonDefaults.MinHeight)
@@ -229,7 +220,7 @@ private fun PromptCreateForm(
         ) {
             Checkbox(
                 checked = selected.value,
-                onCheckedChange = { promptCreateViewModel.setSelected(it) },
+                onCheckedChange = { promptFormViewModel.setSelected(it) },
             )
             Spacer(Modifier.width(16.dp))
             Text(text = "Is Selected?")
@@ -239,7 +230,7 @@ private fun PromptCreateForm(
         androidx.compose.material3.Button(
             onClick = {
                 scope.launch {
-                    promptCreateViewModel.getPreview(text.value)
+                    promptFormViewModel.getPreview(text.value)
                     sheetState.show()
                 }
 //                                promptCreateViewModel.getPreview(text.value)
@@ -256,7 +247,7 @@ private fun PromptCreateForm(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalUnitApi::class)
 @Composable
 fun BottomSheet(
-    viewModel: PromptCreateViewModel,
+    viewModel: PromptFormViewModel,
     sheetState: ModalBottomSheetState
 ){
 
