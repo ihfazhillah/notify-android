@@ -63,7 +63,8 @@ fun FeedListItem(
 @Composable
 fun PromptListItem(
     prompt: ProposalPrompt,
-    onItemActivate: () -> Unit
+    onItemActivate: () -> Unit,
+    onItemEdit: (ProposalPrompt) -> Unit
 ){
     val expanded = remember {
         mutableStateOf(false)
@@ -119,6 +120,12 @@ fun PromptListItem(
             Spacer(Modifier.height(8.dp))
 
             Row(Modifier.fillMaxWidth()){
+                Button(onClick = {
+                    onItemEdit.invoke(prompt)
+                }) {
+                    Text("Edit")
+                }
+
                 if (!prompt.selected){
                     Button(onClick = {
                         onItemActivate.invoke()

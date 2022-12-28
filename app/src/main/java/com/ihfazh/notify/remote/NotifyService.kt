@@ -2,11 +2,7 @@ package com.ihfazh.notify.remote
 
 import com.ihfazh.notify.prompt.ProposalPrompt
 import com.ihfazh.notify.remote.data.*
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface NotifyService {
     @POST("auth-token/")
@@ -39,6 +35,9 @@ interface NotifyService {
 
     @POST("api/proposal-prompts/{id}/activate/")
     suspend fun selectPrompt(@Path("id") id: Int)
+
+    @PUT("api/proposal-prompts/{id}/")
+    suspend fun updateProposalPrompt(@Path("id") id: Int, @Body body: ProposalPromptUpdateBody): ProposalPromptItemResponse
 
     @POST("api/proposal-prompts/preview/")
     suspend fun getProposalPromptPreview(@Body body: ProposalPromptPreviewBody): ProposalPromptPreviewResponse

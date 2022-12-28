@@ -41,3 +41,17 @@ data class ProposalPromptCreateBody(
     @Json(name="selected")
     val selected: Boolean = false,
 )
+
+data class ProposalPromptUpdateBody(
+    @Json(name="id")
+    val pk: Int,
+
+    @Json(name="label")
+    val label: String,
+
+    @Json(name="text")
+    val text: String,
+
+    @Json(name="selected")
+    val selected: Boolean = false,
+)

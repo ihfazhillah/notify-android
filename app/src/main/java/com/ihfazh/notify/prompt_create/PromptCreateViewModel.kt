@@ -21,6 +21,8 @@ class PromptCreateViewModel(
         _label.value = value
     }
 
+    private val _id: MutableStateFlow<Int?> = MutableStateFlow(null)
+
     private val _labelError = MutableStateFlow("")
     val labelError = _labelError.asStateFlow()
 
@@ -58,14 +60,28 @@ class PromptCreateViewModel(
 
     fun submit(next: (Boolean) -> Unit){
         viewModelScope.launch {
-            val body = ProposalPrompt(
-                -1,
-                label.value,
-                text.value,
-                selected.value
-            )
+            val body = if (_id.value == null){
+                ProposalPrompt(
+                    -1,
+                    label.value,
+                    text.value,
+                    selected.value
+                )
+            } else {
+                ProposalPrompt(
+                    _id.value!!,
+                    label.value,
+                    text.value,
+                    selected.value
+                )
+            }
 
-            val res = promptRepository.postProposalPrompt(body)
+            val res = if (_id.value != null){
+                promptRepository.updateProposalPrompt(body)
+            } else {
+                promptRepository.postProposalPrompt(body)
+
+            }
 
             with(Dispatchers.Main){
                 next.invoke(res)
@@ -102,6 +118,13 @@ class PromptCreateViewModel(
             _previewLoading.value = false
         }
 
+    }
+
+    fun setPrompt(prompt: ProposalPrompt){
+        _label.value = prompt.label
+        _text.value = prompt.text
+        _selected.value = prompt.selected
+        _id.value = prompt.id
     }
 
 }

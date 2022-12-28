@@ -3,10 +3,7 @@ package com.ihfazh.notify.prompt_screen
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
@@ -94,7 +91,7 @@ fun PromptScreen(
                 containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
                 onClick = {
-                    navigator.navigate(PromptCreateScreenDestination)
+//                    navigator.navigate(PromptCreateScreenDestination)
                 }
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
@@ -105,7 +102,9 @@ fun PromptScreen(
             NotifyTheme {
                 Box(modifier = Modifier
                     .fillMaxSize()
-                    .pullRefresh(refreshState)){
+                    .pullRefresh(refreshState)
+                    .padding(it)
+                ) {
                     Column {
                         Text(
                             text = "Prompts",
@@ -122,10 +121,16 @@ fun PromptScreen(
 
                             items(prompts.itemCount){ index ->
                                 prompts[index]?.let { prompt ->
-                                    PromptListItem(prompt = prompt){
-                                        promptViewModel.select(prompt.id)
-                                        prompts.refresh()
-                                    }
+                                    PromptListItem(
+                                        prompt = prompt,
+                                        onItemActivate = {
+                                            promptViewModel.select(prompt.id)
+                                            prompts.refresh()
+                                        },
+                                        onItemEdit = {
+                                            navigator.navigate(PromptCreateScreenDestination(it))
+                                        }
+                                    )
                                 }
                             }
                         }

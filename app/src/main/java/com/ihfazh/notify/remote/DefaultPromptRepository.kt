@@ -9,6 +9,7 @@ import com.ihfazh.notify.prompt.PromptRepository
 import com.ihfazh.notify.prompt.ProposalPrompt
 import com.ihfazh.notify.remote.data.ProposalPromptCreateBody
 import com.ihfazh.notify.remote.data.ProposalPromptPreviewBody
+import com.ihfazh.notify.remote.data.ProposalPromptUpdateBody
 import com.ihfazh.notify.remote.paging_source.ProposalPromptListPagingSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Factory
@@ -59,6 +60,30 @@ class DefaultPromptRepository(
             )
         }
     }
+
+    override suspend fun updateProposalPrompt(body: ProposalPrompt): Boolean {
+        val resp = safeApiRequest {
+            api.updateProposalPrompt(
+                body.id,
+                body.asUpdateBody()
+            )
+        }
+
+        return when(resp){
+            is ApiResult.Error -> false
+            is ApiResult.Success -> true
+        }
+    }
+}
+
+private fun ProposalPrompt.asUpdateBody(): ProposalPromptUpdateBody {
+    return ProposalPromptUpdateBody(
+        id,
+        label,
+        text,
+        selected
+    )
+
 }
 
 private fun ProposalPrompt.asBody(): ProposalPromptCreateBody {

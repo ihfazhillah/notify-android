@@ -10,4 +10,5 @@ interface PromptRepository {
     suspend fun postProposalPrompt(body: ProposalPrompt): Boolean
     suspend fun selectPrompt(id: Int)
     suspend fun preview(text: String): SourceResult<PromptPreview>
+    suspend fun updateProposalPrompt(body: ProposalPrompt): Boolean
 }

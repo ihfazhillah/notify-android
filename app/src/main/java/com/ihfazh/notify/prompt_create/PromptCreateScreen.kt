@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.ihfazh.notify.destinations.PromptScreenDestination
+import com.ihfazh.notify.prompt.ProposalPrompt
 import com.ihfazh.notify.prompt_screen.PromptScreen
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.annotation.Destination
@@ -48,16 +49,23 @@ import org.koin.androidx.compose.getViewModel
 @Destination
 @Composable
 fun PromptCreateScreen(
+    prompt: ProposalPrompt? = null,
     navigator: DestinationsNavigator,
     promptCreateViewModel: PromptCreateViewModel = getViewModel()
 ){
     val bottomSheetNavigator = rememberBottomSheetNavigator()
     val navController = rememberNavController(bottomSheetNavigator)
 
+    if (prompt != null){
+        promptCreateViewModel.setPrompt(prompt)
+    }
+
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded}
     )
+
+    val title = if (prompt != null) "Update Prompt" else "Create Prompt"
 
 
     val globalError = remember {
@@ -70,7 +78,7 @@ fun PromptCreateScreen(
             topBar = {
                 TopAppBar(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    title = { Text("Create Prompt") },
+                    title = { Text(title) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.navigateUp() }) {
                             Icon(imageVector = Icons.Default.ArrowBack, "back")
@@ -286,8 +294,11 @@ fun BottomSheet(
             )
             Text(preview.value, lineHeight = TextUnit(1.5f, TextUnitType.Em))
         } else {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 CircularProgressIndicator()
+                Spacer(Modifier.width(16.dp))
                 Text("Loading...")
             }
         }
