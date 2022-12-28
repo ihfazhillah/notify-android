@@ -150,7 +150,9 @@ fun HomeScreen(
                 NotifyTheme {
                     Box(modifier = Modifier
                         .fillMaxSize()
-                        .pullRefresh(refreshState)){
+                        .pullRefresh(refreshState)
+                        .padding(it)
+                    ){
                         Column (
                         ){
                             Text(
