@@ -77,6 +77,9 @@ class PromptCreateViewModel(
     private val _previewText = MutableStateFlow("")
     val previewText = _previewText.asStateFlow()
 
+    private val _jobDescText = MutableStateFlow("")
+    val jobDescText = _jobDescText.asStateFlow()
+
     private val _previewLoading = MutableStateFlow(false)
     val previewLoading = _previewLoading.asStateFlow()
 
@@ -91,11 +94,8 @@ class PromptCreateViewModel(
                     _previewText.value = resp.message!!
                 }
                 is SourceResult.Success -> {
-                    val desc = "JobDesc: \n" + resp.data.jobDesc
-                    val preview = "Preview: \n" + resp.data.preview
-
-                    val data = "$desc\n\n$preview"
-                    _previewText.value = data
+                    _previewText.value = resp.data.preview.trim()
+                    _jobDescText.value = resp.data.jobDesc
                 }
             }
 
