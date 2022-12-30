@@ -1,5 +1,6 @@
 package com.ihfazh.notify.ui.component
 
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -56,6 +57,20 @@ fun FeedListItem(
             color =
             if (isRead) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary
         )
+
+        val published = item.parsedPublished()
+
+        if (published != null){
+            Text(
+                DateUtils.getRelativeTimeSpanString(published.time, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString(),
+                color =
+                if (isRead) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onPrimary,
+                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+            )
+        }
+
+
     }
 }
 
@@ -143,7 +158,7 @@ fun PromptListItem(
 @Preview
 fun FeedListItemPreview(){
     Column() {
-        FeedListItem(item = SimpleFeedItem(1, "Hello world active"), onClick = {}, isRead = false)
-        FeedListItem(item = SimpleFeedItem(2, "Hello world non active"), onClick = {}, isRead = true)
+//        FeedListItem(item = SimpleFeedItem(1, "Hello world active"), onClick = {}, isRead = false)
+//        FeedListItem(item = SimpleFeedItem(2, "Hello world non active"), onClick = {}, isRead = true)
     }
 }
