@@ -7,6 +7,7 @@ import com.ihfazh.notify.common.SourceResult
 import com.ihfazh.notify.prompt.PromptPreview
 import com.ihfazh.notify.prompt.PromptRepository
 import com.ihfazh.notify.prompt.ProposalPrompt
+import com.ihfazh.notify.remote.data.GeneralPromptRequestBody
 import com.ihfazh.notify.remote.data.ProposalPromptCreateBody
 import com.ihfazh.notify.remote.data.ProposalPromptPreviewBody
 import com.ihfazh.notify.remote.data.ProposalPromptUpdateBody
@@ -72,6 +73,23 @@ class DefaultPromptRepository(
         return when(resp){
             is ApiResult.Error -> false
             is ApiResult.Success -> true
+        }
+    }
+
+    override suspend fun generateGeneralPrompt(type: String, body: String): SourceResult<String> {
+        val typeMap = mapOf(
+            "summarize" to 1,
+            "teaser" to 2,
+            "keyPoints" to 3,
+            "suggestion" to 5,
+            "question" to 4
+        )
+        val resp = safeApiRequest {
+            api.generalPromptRequest(GeneralPromptRequestBody(typeMap[type]!!, body))
+        }
+        return when(resp){
+            is ApiResult.Error -> SourceResult.Error("hllo")
+            is ApiResult.Success -> SourceResult.Success(resp.data.response?.choices?.get(0)?.text ?: "")
         }
     }
 }

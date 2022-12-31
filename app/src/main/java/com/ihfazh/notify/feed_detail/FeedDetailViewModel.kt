@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ihfazh.notify.common.SourceResult
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed.FeedRepository
+import com.ihfazh.notify.prompt.PromptRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,7 +23,8 @@ sealed class FeedState<T>{
 
 @KoinViewModel
 class FeedDetailViewModel(
-    private val feedRepository: FeedRepository
+    private val feedRepository: FeedRepository,
+    private val promptRepository: PromptRepository
 ): ViewModel() {
 
     private val _feedState : MutableStateFlow<FeedState<FeedItemDetail>> = MutableStateFlow(FeedState.Empty())
@@ -72,5 +74,115 @@ class FeedDetailViewModel(
             _proposalLoading.value = false
         }
 
+    }
+
+    private val _summarizeLoading = MutableStateFlow(false)
+    val summarizeLoading = _summarizeLoading.asStateFlow()
+
+    private val _summarizeString = MutableStateFlow("")
+    val summarizeString = _summarizeString.asStateFlow()
+
+    fun getSummarize(text: String){
+        _summarizeLoading.value = true
+        viewModelScope.launch {
+            when(val resp = promptRepository.generateGeneralPrompt("summarize", text)){
+                is SourceResult.Error -> {
+                    _summarizeString.value = "ERRRORRR"
+                }
+                is SourceResult.Success -> {
+                    _summarizeString.value = resp.data
+                }
+            }
+
+            _summarizeLoading.value = false
+        }
+    }
+
+    private val _teaserLoading = MutableStateFlow(false)
+    val teaserLoading = _teaserLoading.asStateFlow()
+
+    private val _teaserString = MutableStateFlow("")
+    val teaserString = _teaserString.asStateFlow()
+
+    fun getTeaser(text: String){
+        _teaserLoading.value = true
+        viewModelScope.launch {
+            when(val resp = promptRepository.generateGeneralPrompt("teaser", text)){
+                is SourceResult.Error -> {
+                    _teaserString.value = "ERRRORRR"
+                }
+                is SourceResult.Success -> {
+                    _teaserString.value = resp.data
+                }
+            }
+
+            _teaserLoading.value = false
+        }
+    }
+
+    private val _questionLoading = MutableStateFlow(false)
+    val questionLoading = _questionLoading.asStateFlow()
+
+    private val _questionString = MutableStateFlow("")
+    val questionString = _questionString.asStateFlow()
+
+    fun getQuestion(text: String){
+        _questionLoading.value = true
+        viewModelScope.launch {
+            when(val resp = promptRepository.generateGeneralPrompt("question", text)){
+                is SourceResult.Error -> {
+                    _questionString.value = "ERRRORRR"
+                }
+                is SourceResult.Success -> {
+                    _questionString.value = resp.data
+                }
+            }
+
+            _questionLoading.value = false
+        }
+    }
+
+    private val _suggestionLoading = MutableStateFlow(false)
+    val suggestionLoading = _suggestionLoading.asStateFlow()
+
+    private val _suggestionString = MutableStateFlow("")
+    val suggestionString = _suggestionString.asStateFlow()
+
+    fun getSuggestion(text: String){
+        _suggestionLoading.value = true
+        viewModelScope.launch {
+            when(val resp = promptRepository.generateGeneralPrompt("suggestion", text)){
+                is SourceResult.Error -> {
+                    _suggestionString.value = "ERRRORRR"
+                }
+                is SourceResult.Success -> {
+                    _suggestionString.value = resp.data
+                }
+            }
+
+            _suggestionLoading.value = false
+        }
+    }
+
+    private val _keyPointsLoading = MutableStateFlow(false)
+    val keyPointsLoading = _keyPointsLoading.asStateFlow()
+
+    private val _keyPointsString = MutableStateFlow("")
+    val keyPointsString = _keyPointsString.asStateFlow()
+
+    fun getKeyPoints(text: String){
+        _keyPointsLoading.value = true
+        viewModelScope.launch {
+            when(val resp = promptRepository.generateGeneralPrompt("keyPoints", text)){
+                is SourceResult.Error -> {
+                    _keyPointsString.value = "ERRRORRR"
+                }
+                is SourceResult.Success -> {
+                    _keyPointsString.value = resp.data
+                }
+            }
+
+            _keyPointsLoading.value = false
+        }
     }
 }

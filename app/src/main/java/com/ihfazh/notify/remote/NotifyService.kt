@@ -41,4 +41,7 @@ interface NotifyService {
 
     @POST("api/proposal-prompts/preview/")
     suspend fun getProposalPromptPreview(@Body body: ProposalPromptPreviewBody): ProposalPromptPreviewResponse
+
+    @POST("api/general-prompt-request/")
+    suspend fun generalPromptRequest(@Body body: GeneralPromptRequestBody): GeneralPromptRequestResponse
 }

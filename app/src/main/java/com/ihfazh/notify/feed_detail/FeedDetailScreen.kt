@@ -6,13 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.core.AnimationVector
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -25,6 +27,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.*
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -144,14 +147,14 @@ fun FeedItemDetail(
                 )
             },
             floatingActionButton = {
-                if (pagerState.currentPage == 1){
-                    // in the proposal page
-                    androidx.compose.material3.FloatingActionButton(onClick = {
-                        feedItemViewModel.loadProposal(id)
-                    }) {
-                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
-                    }
-                }
+//                if (pagerState.currentPage == 1){
+//                    // in the proposal page
+//                    androidx.compose.material3.FloatingActionButton(onClick = {
+//                        feedItemViewModel.loadProposal(id)
+//                    }) {
+//                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
+//                    }
+//                }
             },
             content = {
                 when(feedState.value){
@@ -163,7 +166,7 @@ fun FeedItemDetail(
                     is Success -> {
                         val resp = (feedState.value as Success)
                         Column(
-                            Modifier.fillMaxSize()
+                            Modifier.fillMaxSize().padding(it)
                         ) {
                             TabRow(
                                 // Our selected tab is our current page
@@ -187,7 +190,7 @@ fun FeedItemDetail(
                                     },
                                 )
                                 Tab(
-                                    text = { Text("Proposal Example") },
+                                    text = { Text("Tools") },
                                     selected = pagerState.currentPage == 1,
                                     onClick = {
                                         scope.launch(Dispatchers.Main) {
@@ -201,9 +204,10 @@ fun FeedItemDetail(
                                 if (it == 0){
                                     JobDescriptionContent(feedItem = resp.item)
                                 } else {
-                                    ProposalExampleContent(example.value, loading=loading.value){ value ->
-                                        feedItemViewModel.setExample(value)
-                                    }
+                                    FeedItemTools(feedItem = resp.item, viewModel = feedItemViewModel)
+//                                    ProposalExampleContent(example.value, loading=loading.value){ value ->
+//                                        feedItemViewModel.setExample(value)
+//                                    }
                                 }
 
                             }
@@ -212,6 +216,286 @@ fun FeedItemDetail(
                 }
             }
         ) 
+    }
+}
+
+
+@OptIn(ExperimentalUnitApi::class)
+@Composable
+fun ExpandableItem(
+    modifier: Modifier = Modifier,
+    title: String,
+    onToggle: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit
+){
+    var isOpen by remember{
+        mutableStateOf(false)
+    }
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .border(
+                BorderStroke(
+                    1.dp,
+                    androidx.compose.material3.MaterialTheme.colorScheme.primary
+                ), RoundedCornerShape(10.dp)
+            )
+    ) {
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    isOpen = !isOpen
+                    onToggle.invoke(isOpen)
+                }
+                .padding(16.dp)
+                    ,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                title,
+                fontSize = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontSize,
+                fontWeight = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontWeight,
+                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+            )
+
+            Icon(
+                imageVector = if (isOpen) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowRight,
+                contentDescription = "toggle"
+            )
+
+        }
+
+        if (isOpen){
+            Divider(thickness = 2.dp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(8.dp))
+
+            Column (
+                Modifier.padding(16.dp)
+            ){
+                content()
+            }
+        }
+
+
+    }
+
+}
+
+
+@OptIn(ExperimentalUnitApi::class)
+@Composable
+private fun FeedItemTools(
+    feedItem: FeedItemDetail,
+    viewModel: FeedDetailViewModel
+){
+    val scrollState = rememberScrollState()
+
+    val summaryLoading = viewModel.summarizeLoading.collectAsState()
+    val summaryString = viewModel.summarizeString.collectAsState()
+
+    val teaserLoading = viewModel.teaserLoading.collectAsState()
+    val teaserString = viewModel.teaserString.collectAsState()
+
+    val questionLoading = viewModel.questionLoading.collectAsState()
+    val questionString = viewModel.questionString.collectAsState()
+
+    val suggestionLoading = viewModel.suggestionLoading.collectAsState()
+    val suggestionString = viewModel.suggestionString.collectAsState()
+
+    val keyPointsLoading = viewModel.keyPointsLoading.collectAsState()
+    val keyPointsString = viewModel.keyPointsString.collectAsState()
+
+    val proposalLoading = viewModel.proposalLoading.collectAsState()
+    val proposalString = viewModel.example.collectAsState()
+
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ){
+
+        item{
+            ExpandableItem(title = "Summarize", onToggle = {
+                if (it && summaryString.value.isEmpty()){
+                   viewModel.getSummarize("Job Description: [${feedItem.description}]")
+                }
+            }){
+                Box(Modifier.fillMaxSize()){
+
+                    if (summaryLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            summaryString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(16.dp))
+        }
+
+
+        item{
+            ExpandableItem(
+                title = "Teaser",
+                onToggle = {
+                   if (it && teaserString.value.isEmpty()){
+                       viewModel.getTeaser("Job Description: [${feedItem.description}]")
+                   }
+                }
+            ){
+                Box(Modifier.fillMaxSize()){
+
+                    if (teaserLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            teaserString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
+
+
+        item {
+            Spacer(Modifier.height(16.dp))
+        }
+
+
+        item{
+            ExpandableItem(
+                title = "Suggestion",
+                onToggle = {
+                    if (it && suggestionString.value.isEmpty()){
+                        viewModel.getSuggestion("Job Description: [${feedItem.description}]")
+                    }
+                }
+            ){
+                Box(Modifier.fillMaxSize()){
+
+                    if (suggestionLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            suggestionString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
+
+
+        item {
+            Spacer(Modifier.height(16.dp))
+        }
+
+
+        item{
+            ExpandableItem(
+                title = "Key Points",
+                onToggle = {
+                    if (it && keyPointsString.value.isEmpty()){
+                        viewModel.getKeyPoints("Job Description: [${feedItem.description}]")
+                    }
+                }
+            ){
+                Box(Modifier.fillMaxSize()){
+
+                    if (keyPointsLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            keyPointsString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(16.dp))
+        }
+
+
+        item{
+            ExpandableItem(
+                title = "Questions",
+                onToggle = {
+                    if (it && questionString.value.isEmpty()){
+                        viewModel.getQuestion("Job Description: [${feedItem.description}]")
+                    }
+                }
+            ){
+                Box(Modifier.fillMaxSize()){
+
+                    if (questionLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            questionString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(16.dp))
+        }
+
+
+        item{
+            ExpandableItem(
+                title = "Proposal",
+                onToggle = {
+                    if (it && proposalString.value.isEmpty()){
+                        viewModel.loadProposal(feedItem.id)
+                    }
+                }
+            ){
+                Box(Modifier.fillMaxSize()){
+
+                    if (proposalLoading.value){
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    } else {
+                        Text(
+                            proposalString.value.trim(),
+                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                        )
+                    }
+
+                }
+            }
+        }
     }
 }
 
