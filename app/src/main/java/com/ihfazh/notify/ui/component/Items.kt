@@ -1,25 +1,26 @@
 package com.ihfazh.notify.ui.component
 
 import android.text.format.DateUtils
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.rememberSwipeableState
-import androidx.compose.material.swipeable
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -99,59 +100,114 @@ fun PromptListItem(
         com.ihfazh.notify.R.drawable.ic_baseline_keyboard_arrow_down_24
     }
 
-
-    Column(
-        Modifier
-            .background(color)
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clickable {
-                expanded.value = !expanded.value
-            },
-    ){
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                prompt.label,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                color = contentColor,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(0.8f),
-                maxLines = 2
-            )
-
-            Icon(
-                painter = painterResource(id = caret),
-                contentDescription = "Toggle",
-                tint = contentColor
-            )
+    val dismissState = rememberDismissState(DismissValue.Default){
+        if (it == DismissValue.DismissedToEnd){
+            onItemActivate.invoke()
+            return@rememberDismissState false
         }
 
-        if (expanded.value){
-            Spacer(Modifier.height(8.dp))
-            Text(prompt.text, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = contentColor)
-            Spacer(Modifier.height(8.dp))
+        if (it == DismissValue.DismissedToStart){
+            onItemEdit.invoke(prompt)
+            return@rememberDismissState false
+        }
 
-            Row(Modifier.fillMaxWidth()){
-                Button(onClick = {
-                    onItemEdit.invoke(prompt)
-                }) {
-                    Text("Edit")
+        true
+    }
+
+    SwipeToDismiss(
+        state = dismissState,
+        background = {
+            val direction = dismissState.dismissDirection ?: return@SwipeToDismiss
+
+            val backgroundColor by animateColorAsState(
+                targetValue = when (dismissState.targetValue) {
+                    DismissValue.Default -> color
+                    DismissValue.DismissedToEnd -> androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    DismissValue.DismissedToStart -> androidx.compose.material3.MaterialTheme.colorScheme.secondary
                 }
+            )
 
-                if (!prompt.selected){
-                    Button(onClick = {
-                        onItemActivate.invoke()
-                    }) {
+            val icon = when(direction){
+                DismissDirection.StartToEnd -> Icons.Default.Check
+                DismissDirection.EndToStart -> Icons.Default.Edit
+            }
+            
+            val scale by animateFloatAsState(targetValue = if (dismissState.targetValue == DismissValue.Default) 0f else 1.2f)
+
+            val alignment = when(direction){
+                DismissDirection.StartToEnd -> Alignment.CenterStart
+                DismissDirection.EndToStart -> Alignment.CenterEnd
+            }
+
+            Box(
+                Modifier.fillMaxSize().background(backgroundColor).padding(12.dp, 12.dp),
+                contentAlignment = alignment
+            ){
+                Row{
+                    if (direction == DismissDirection.EndToStart){
+                        Text("Edit")
+                        Spacer(Modifier.width(16.dp))
+                    }
+                    Icon(icon, contentDescription = "Hello world", modifier = Modifier.scale(scale))
+                    if (direction == DismissDirection.StartToEnd){
+                        Spacer(Modifier.width(16.dp))
                         Text("Activate")
                     }
                 }
+
+
+            }
+
+
+        },
+        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+        dismissThresholds = { FractionalThreshold(0.2f) }
+    ) {
+
+        Column(
+            Modifier
+                .background(color)
+                .fillMaxWidth()
+                .padding(16.dp)
+                .clickable {
+                    expanded.value = !expanded.value
+                },
+        ){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    prompt.label,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    color = contentColor,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    maxLines = 2
+                )
+
+                Icon(
+                    painter = painterResource(id = caret),
+                    contentDescription = "Toggle",
+                    tint = contentColor
+                )
+            }
+
+            AnimatedVisibility(visible = expanded.value) {
+                Column {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        prompt.text,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        color = contentColor
+                    )
+                }
+
             }
         }
 
     }
+
 }
 
 @Composable
