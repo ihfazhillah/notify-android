@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,6 +44,7 @@ import com.ihfazh.notify.MainActivity
 import com.ihfazh.notify.R
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed_detail.FeedState.*
+import com.ihfazh.notify.proposal.MyProposalState
 import com.ihfazh.notify.ui.component.HtmlText
 import com.ihfazh.notify.ui.theme.NotifyTheme
 import com.ramcosta.composedestinations.annotation.DeepLink
@@ -56,7 +58,7 @@ import timber.log.Timber
 import java.util.regex.Pattern
 
 
-@OptIn(ExperimentalUnitApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalUnitApi::class, ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Destination(
     route="item_detail",
@@ -122,6 +124,11 @@ fun FeedItemDetail(
 
     val loading = feedItemViewModel.proposalLoading.collectAsState()
 
+    val bottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded}
+    )
+
 
     NotifyTheme {
         Scaffold(
@@ -148,23 +155,36 @@ fun FeedItemDetail(
                 )
             },
             floatingActionButton = {
-//                if (pagerState.currentPage == 1){
-//                    // in the proposal page
-//                    androidx.compose.material3.FloatingActionButton(onClick = {
-//                        feedItemViewModel.loadProposal(id)
-//                    }) {
-//                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
-//                    }
-//                }
-            },
-            content = {
-                when(feedState.value){
-                    is Empty -> {}
-                    is Error -> {}
-                    is Loading -> {
-                        Text("Loading...")
+                if (pagerState.currentPage == 1){
+                    androidx.compose.material3.FloatingActionButton(onClick = {
+                        feedItemViewModel.loadMyProposal(id)
+                        scope.launch {
+                            bottomSheetState.show()
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
                     }
-                    is Success -> {
+                }
+            }
+        ) {
+            when (feedState.value) {
+                is Empty -> {}
+                is Error -> {}
+                is Loading -> {
+                    Text("Loading...")
+                }
+                is Success -> {
+                    ModalBottomSheetLayout(
+                        sheetState = bottomSheetState,
+                        sheetContent = {
+                            ProposalWriter(
+                                viewModel = feedItemViewModel,
+                                sheetState = bottomSheetState
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
                         val resp = (feedState.value as Success)
                         Column(
                             Modifier
@@ -204,10 +224,13 @@ fun FeedItemDetail(
                             }
 
                             HorizontalPager(count = 2, state = pagerState) {
-                                if (it == 0){
+                                if (it == 0) {
                                     JobDescriptionContent(feedItem = resp.item)
                                 } else {
-                                    FeedItemTools(feedItem = resp.item, viewModel = feedItemViewModel)
+                                    FeedItemTools(
+                                        feedItem = resp.item,
+                                        viewModel = feedItemViewModel
+                                    )
 //                                    ProposalExampleContent(example.value, loading=loading.value){ value ->
 //                                        feedItemViewModel.setExample(value)
 //                                    }
@@ -218,7 +241,7 @@ fun FeedItemDetail(
                     }
                 }
             }
-        ) 
+        }
     }
 }
 
@@ -607,53 +630,67 @@ private fun FeedItemTools(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
-@OptIn(ExperimentalUnitApi::class)
-private fun ProposalExampleContent(example: String, loading: Boolean = false, onValueChange: (String) -> Unit) {
+fun ProposalWriter(
+    viewModel: FeedDetailViewModel,
+    sheetState: ModalBottomSheetState
+){
+
     val scrollState = rememberScrollState()
-    val clipboardManager = LocalClipboardManager.current
-    val context = LocalContext.current
 
-    Box(Modifier.fillMaxSize()){
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState)
-        ) {
-            Button(onClick = {
-                clipboardManager.setText(AnnotatedString(example))
-                Toast.makeText(context, "Example copied into clipboard", Toast.LENGTH_SHORT).show()
-            }) {
-                Row {
-                    Icon(painter = painterResource(id = R.drawable.ic_baseline_content_copy_24), contentDescription = "COPY")
-                    Text("Copy to Clipboard")
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-            if (example.isNotEmpty()) {
-                OutlinedTextField(
-                    value = example,
-                    onValueChange = onValueChange,
-                    textStyle=androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                    colors=TextFieldDefaults.textFieldColors(
-                        backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
-                        textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
-                    ),
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+    val myProposalState: State<MyProposalState> = viewModel.myProposalState.collectAsState()
+    val myProposalString : State<String> = viewModel.myProposalString.collectAsState()
 
+    val statusString : State<String> = remember{
+        derivedStateOf {
+            when(myProposalState.value){
+                MyProposalState.Initial -> "Initial"
+                MyProposalState.Draft -> "Draft"
+                is MyProposalState.Error -> (myProposalState.value as MyProposalState.Error).message ?: "Unknown"
+                MyProposalState.Loading -> "Loading..."
+                MyProposalState.Saved -> "Saved..."
+                MyProposalState.Saving -> "Saving..."
             }
-        }
-        if (loading){
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
         }
     }
-}
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ){
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)) {
+            Text(
+                statusString.value,
+                fontSize = androidx.compose.material3.MaterialTheme.typography.labelMedium.fontSize,
+                fontStyle = androidx.compose.material3.MaterialTheme.typography.labelMedium.fontStyle,
+            )
+        }
+
+        Divider()
+        Spacer(Modifier.height(8.dp))
+
+        androidx.compose.material3.OutlinedTextField(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            value = myProposalString.value,
+            onValueChange = {
+                viewModel.setMyProposal(it)
+            },
+            singleLine = false,
+            minLines = 10
+        )
+
+
+    }
+
+}
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable

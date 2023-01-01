@@ -8,6 +8,7 @@ import com.ihfazh.notify.common.SourceResult
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed.FeedRepository
 import com.ihfazh.notify.prompt.PromptRepository
+import com.ihfazh.notify.proposal.MyProposalState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -184,5 +185,24 @@ class FeedDetailViewModel(
 
             _keyPointsLoading.value = false
         }
+    }
+
+
+    private val _myProposalState :MutableStateFlow<MyProposalState> = MutableStateFlow(MyProposalState.Initial)
+    val myProposalState = _myProposalState.asStateFlow()
+
+    private val _myProposalString = MutableStateFlow("")
+    val myProposalString = _myProposalString.asStateFlow()
+
+    fun loadMyProposal(id: Int){
+
+    }
+
+    fun saveMyProposal(id: Int){
+
+    }
+
+    fun setMyProposal(text: String) {
+        _myProposalString.value = text
     }
 }
