@@ -195,14 +195,34 @@ class FeedDetailViewModel(
     val myProposalString = _myProposalString.asStateFlow()
 
     fun loadMyProposal(id: Int){
-
+        _myProposalState.value = MyProposalState.Loading
+        viewModelScope.launch {
+            when(val resp = feedRepository.loadMyProposal(id)){
+                is SourceResult.Error -> {
+                    _myProposalState.value = MyProposalState.Error(resp.message)
+                }
+                is SourceResult.Success -> {
+                    _myProposalState.value = MyProposalState.Draft
+                    setMyProposal(resp.data)
+                }
+            }
+        }
     }
 
     fun saveMyProposal(id: Int){
-
+        _myProposalState.value = MyProposalState.Saving
+        viewModelScope.launch {
+            when(val resp = feedRepository.updateMyProposal(id, _myProposalString.value)){
+                is SourceResult.Success -> _myProposalState.value = resp.data
+                else -> {
+                    _myProposalState.value = MyProposalState.Error("Error")
+                }
+            }
+        }
     }
 
     fun setMyProposal(text: String) {
+        _myProposalState.value = MyProposalState.Draft
         _myProposalString.value = text
     }
 }

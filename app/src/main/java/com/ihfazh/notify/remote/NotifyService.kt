@@ -23,6 +23,15 @@ interface NotifyService {
     @POST("api/feed-items/{id}/generate_proposal/")
     suspend fun generateProposal(@Path("id") id: Int): GenerateProposalResponse
 
+    @GET("api/feed-items/{id}/my_proposal/")
+    suspend fun getMyProposal(@Path("id") id: Int): MyProposalResponse
+
+    @POST("api/feed-items/{id}/update_my_proposal/")
+    suspend fun updateMyProposal(
+        @Path("id") id: Int,
+        @Body body: MyProposalBody
+    ): MyProposalResponse
+
     @GET("api/proposal-prompts/")
     suspend fun getProposalPrompts(
         @Query("page") page: Int

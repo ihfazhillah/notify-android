@@ -7,7 +7,9 @@ import com.ihfazh.notify.common.SourceResult
 import com.ihfazh.notify.feed.FeedItemDetail
 import com.ihfazh.notify.feed.FeedRepository
 import com.ihfazh.notify.feed.SimpleFeedItem
+import com.ihfazh.notify.proposal.MyProposalState
 import com.ihfazh.notify.remote.data.FeedItemResponse
+import com.ihfazh.notify.remote.data.MyProposalBody
 import com.ihfazh.notify.remote.paging_source.FeedListPagingSource
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.annotation.Factory
@@ -76,5 +78,32 @@ class DefaultFeedRepository(
             is ApiResult.Error -> SourceResult.Error("Something bad happen")
             is ApiResult.Success -> SourceResult.Success(resp.data.proposal)
         }
+    }
+
+    override suspend fun loadMyProposal(id: Int): SourceResult<String> {
+        return when(val resp = safeApiRequest { remote.getMyProposal(id) }){
+            is ApiResult.Error -> {
+                SourceResult.Error(resp.message)
+            }
+            is ApiResult.Success -> {
+                SourceResult.Success(resp.data.text)
+            }
+        }
+    }
+
+    override suspend fun updateMyProposal(id: Int, text: String): SourceResult<MyProposalState> {
+        return when(
+            val resp = safeApiRequest { remote.updateMyProposal(id, MyProposalBody(text)) }
+        ){
+            is ApiResult.Error -> {
+                SourceResult.Success(MyProposalState.Error(resp.message))
+            }
+            is ApiResult.Success -> {
+                SourceResult.Success(
+                    MyProposalState.Saved
+                )
+            }
+        }
+
     }
 }

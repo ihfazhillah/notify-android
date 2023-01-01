@@ -52,6 +52,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import timber.log.Timber
@@ -179,7 +180,8 @@ fun FeedItemDetail(
                         sheetContent = {
                             ProposalWriter(
                                 viewModel = feedItemViewModel,
-                                sheetState = bottomSheetState
+                                sheetState = bottomSheetState,
+                                feedId = id
                             )
                         },
                         modifier = Modifier
@@ -634,13 +636,19 @@ private fun FeedItemTools(
 @Composable
 fun ProposalWriter(
     viewModel: FeedDetailViewModel,
-    sheetState: ModalBottomSheetState
+    sheetState: ModalBottomSheetState,
+    feedId: Int
 ){
 
     val scrollState = rememberScrollState()
 
     val myProposalState: State<MyProposalState> = viewModel.myProposalState.collectAsState()
     val myProposalString : State<String> = viewModel.myProposalString.collectAsState()
+
+    LaunchedEffect(myProposalString.value){
+        delay(3000)
+        viewModel.saveMyProposal(feedId)
+    }
 
     val statusString : State<String> = remember{
         derivedStateOf {
