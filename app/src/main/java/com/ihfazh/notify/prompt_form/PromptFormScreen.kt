@@ -106,6 +106,7 @@ fun PromptFormScreen(
                         },
                         modifier = Modifier
                             .fillMaxSize()
+                            .padding(it)
                     ) {
                         PromptForm(
                             promptFormViewModel,

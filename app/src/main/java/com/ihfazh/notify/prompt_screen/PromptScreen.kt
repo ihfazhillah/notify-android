@@ -52,8 +52,8 @@ fun PromptScreen(
     LaunchedEffect(prompts.loadState.source){
         val isLoading = listOf(
             prompts.loadState.source.refresh is LoadState.Loading,
-            prompts.loadState.source.prepend is LoadState.Loading,
-            prompts.loadState.source.append is LoadState.Loading,
+//            prompts.loadState.source.prepend is LoadState.Loading,
+//            prompts.loadState.source.append is LoadState.Loading,
         ).any { it }
         refreshing = isLoading
     }
@@ -91,7 +91,7 @@ fun PromptScreen(
                 containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
                 onClick = {
-//                    navigator.navigate(PromptCreateScreenDestination)
+                    navigator.navigate(PromptFormScreenDestination.route)
                 }
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")

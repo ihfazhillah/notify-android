@@ -113,8 +113,8 @@ fun HomeScreen(
     LaunchedEffect(feeds.loadState.source){
         val isLoading = listOf(
             feeds.loadState.source.refresh is LoadState.Loading,
-            feeds.loadState.source.prepend is LoadState.Loading,
-            feeds.loadState.source.append is LoadState.Loading,
+//            feeds.loadState.source.prepend is LoadState.Loading,
+//            feeds.loadState.source.append is LoadState.Loading,
         ).any { it }
         refreshing = isLoading
     }
