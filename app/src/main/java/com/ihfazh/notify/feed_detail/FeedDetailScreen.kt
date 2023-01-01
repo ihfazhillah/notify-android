@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -166,7 +167,9 @@ fun FeedItemDetail(
                     is Success -> {
                         val resp = (feedState.value as Success)
                         Column(
-                            Modifier.fillMaxSize().padding(it)
+                            Modifier
+                                .fillMaxSize()
+                                .padding(it)
                         ) {
                             TabRow(
                                 // Our selected tab is our current page
@@ -226,6 +229,7 @@ fun ExpandableItem(
     modifier: Modifier = Modifier,
     title: String,
     onToggle: (Boolean) -> Unit = {},
+    actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ){
     var isOpen by remember{
@@ -269,14 +273,21 @@ fun ExpandableItem(
         }
 
         if (isOpen){
-            Divider(thickness = 2.dp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(8.dp))
+            Divider(thickness = 1.dp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
 
             Column (
                 Modifier.padding(16.dp)
             ){
                 content()
             }
+
+            Divider(
+                thickness = 1.dp,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp, 0.dp)
+            )
+
+            actions()
         }
 
 
@@ -318,22 +329,41 @@ private fun FeedItemTools(
     ){
 
         item{
-            ExpandableItem(title = "Summarize", onToggle = {
-                if (it && summaryString.value.isEmpty()){
-                   viewModel.getSummarize("Job Description: [${feedItem.description}]")
+            ExpandableItem(
+                title = "Summarize",
+                onToggle = {
+                    if (it && summaryString.value.isEmpty()) {
+                        viewModel.getSummarize("Job Description: [${feedItem.description}]")
+                    }
+                },
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.getSummarize("Job Description: [${feedItem.description}]")
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
+
                 }
-            }){
+            ){
                 Box(Modifier.fillMaxSize()){
 
                     if (summaryLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            summaryString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                summaryString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                            )
+                        }
                     }
 
                 }
@@ -352,6 +382,20 @@ private fun FeedItemTools(
                    if (it && teaserString.value.isEmpty()){
                        viewModel.getTeaser("Job Description: [${feedItem.description}]")
                    }
+                },
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.getTeaser("Job Description: [${feedItem.description}]")
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
+
                 }
             ){
                 Box(Modifier.fillMaxSize()){
@@ -359,12 +403,14 @@ private fun FeedItemTools(
                     if (teaserLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            teaserString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                teaserString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                            )
+                        }
                     }
 
                 }
@@ -384,6 +430,19 @@ private fun FeedItemTools(
                     if (it && suggestionString.value.isEmpty()){
                         viewModel.getSuggestion("Job Description: [${feedItem.description}]")
                     }
+                },
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.getSuggestion("Job Description: [${feedItem.description}]")
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
                 }
             ){
                 Box(Modifier.fillMaxSize()){
@@ -391,12 +450,14 @@ private fun FeedItemTools(
                     if (suggestionLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            suggestionString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                suggestionString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em),
+                            )
+                        }
                     }
 
                 }
@@ -416,6 +477,20 @@ private fun FeedItemTools(
                     if (it && keyPointsString.value.isEmpty()){
                         viewModel.getKeyPoints("Job Description: [${feedItem.description}]")
                     }
+                },
+
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.getKeyPoints("Job Description: [${feedItem.description}]")
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
                 }
             ){
                 Box(Modifier.fillMaxSize()){
@@ -423,12 +498,14 @@ private fun FeedItemTools(
                     if (keyPointsLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            keyPointsString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                keyPointsString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                            )
+                        }
                     }
 
                 }
@@ -447,6 +524,20 @@ private fun FeedItemTools(
                     if (it && questionString.value.isEmpty()){
                         viewModel.getQuestion("Job Description: [${feedItem.description}]")
                     }
+                },
+
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.getQuestion("Job Description: [${feedItem.description}]")
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
                 }
             ){
                 Box(Modifier.fillMaxSize()){
@@ -454,12 +545,14 @@ private fun FeedItemTools(
                     if (questionLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            questionString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                questionString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                            )
+                        }
                     }
 
                 }
@@ -478,6 +571,19 @@ private fun FeedItemTools(
                     if (it && proposalString.value.isEmpty()){
                         viewModel.loadProposal(feedItem.id)
                     }
+                },
+                actions = {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        IconButton(onClick = {
+                            viewModel.loadProposal(feedItem.id)
+                        }) {
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        }
+                    }
                 }
             ){
                 Box(Modifier.fillMaxSize()){
@@ -485,12 +591,14 @@ private fun FeedItemTools(
                     if (proposalLoading.value){
                         CircularProgressIndicator(Modifier.align(Alignment.Center))
                     } else {
-                        Text(
-                            proposalString.value.trim(),
-                            fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
-                            fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
-                            lineHeight = TextUnit(1.5f, TextUnitType.Em)
-                        )
+                        SelectionContainer {
+                            Text(
+                                proposalString.value.trim(),
+                                fontSize = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontSize,
+                                fontStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge.fontStyle,
+                                lineHeight = TextUnit(1.5f, TextUnitType.Em)
+                            )
+                        }
                     }
 
                 }
