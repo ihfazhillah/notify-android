@@ -641,7 +641,7 @@ fun ProposalWriter(
     val myProposalString : State<String> = viewModel.myProposalString.collectAsState()
 
     LaunchedEffect(myProposalString.value){
-        if (myProposalString.value.isNotEmpty()){
+        if (myProposalString.value.isNotEmpty() || myProposalState.value is MyProposalState.Draft){
             delay(3000)
             viewModel.saveMyProposal(feedId)
         }
