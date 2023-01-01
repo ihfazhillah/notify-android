@@ -156,15 +156,13 @@ fun FeedItemDetail(
                 )
             },
             floatingActionButton = {
-                if (pagerState.currentPage == 1){
-                    androidx.compose.material3.FloatingActionButton(onClick = {
-                        feedItemViewModel.loadMyProposal(id)
-                        scope.launch {
-                            bottomSheetState.show()
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.Refresh, "Refresh")
+                androidx.compose.material3.FloatingActionButton(onClick = {
+                    feedItemViewModel.loadMyProposal(id)
+                    scope.launch {
+                        bottomSheetState.show()
                     }
+                }) {
+                    Icon(painter = painterResource(id = R.drawable.ic_baseline_edit_note_24), "Refresh")
                 }
             }
         ) {
@@ -233,9 +231,6 @@ fun FeedItemDetail(
                                         feedItem = resp.item,
                                         viewModel = feedItemViewModel
                                     )
-//                                    ProposalExampleContent(example.value, loading=loading.value){ value ->
-//                                        feedItemViewModel.setExample(value)
-//                                    }
                                 }
 
                             }
