@@ -646,8 +646,10 @@ fun ProposalWriter(
     val myProposalString : State<String> = viewModel.myProposalString.collectAsState()
 
     LaunchedEffect(myProposalString.value){
-        delay(3000)
-        viewModel.saveMyProposal(feedId)
+        if (myProposalString.value.isNotEmpty()){
+            delay(3000)
+            viewModel.saveMyProposal(feedId)
+        }
     }
 
     val statusString : State<String> = remember{
@@ -663,6 +665,9 @@ fun ProposalWriter(
         }
     }
 
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -672,12 +677,32 @@ fun ProposalWriter(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)) {
-            Text(
-                statusString.value,
-                fontSize = androidx.compose.material3.MaterialTheme.typography.labelMedium.fontSize,
-                fontStyle = androidx.compose.material3.MaterialTheme.typography.labelMedium.fontStyle,
-            )
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column{
+                Text(
+                    "My Proposal",
+                    fontSize = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontWeight,
+                    fontStyle = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontStyle,
+                )
+                Text(
+                    statusString.value,
+                    fontSize = androidx.compose.material3.MaterialTheme.typography.labelLarge.fontSize,
+                    fontStyle = androidx.compose.material3.MaterialTheme.typography.labelLarge.fontStyle,
+                )
+            }
+
+            IconButton(onClick = {
+                clipboardManager.setText(
+                    AnnotatedString(myProposalString.value)
+                )
+                Toast.makeText(context, "Proposal Copied", Toast.LENGTH_SHORT).show()
+            }) {
+                Icon(painter = painterResource(id = R.drawable.ic_baseline_content_copy_24), contentDescription = "Copy")
+            }
         }
 
         Divider()
