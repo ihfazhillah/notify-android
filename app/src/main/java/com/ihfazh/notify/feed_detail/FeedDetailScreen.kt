@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
@@ -292,25 +293,25 @@ fun ExpandableItem(
 
         }
 
-        if (isOpen){
-            Divider(thickness = 1.dp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+        AnimatedVisibility(visible = isOpen) {
+            Column {
+                Divider(thickness = 1.dp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
 
-            Column (
-                Modifier.padding(16.dp)
-            ){
-                content()
+                Column (
+                    Modifier.padding(16.dp)
+                ){
+                    content()
+                }
+
+                Divider(
+                    thickness = 1.dp,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(16.dp, 0.dp)
+                )
+
+                actions()
             }
-
-            Divider(
-                thickness = 1.dp,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(16.dp, 0.dp)
-            )
-
-            actions()
         }
-
-
     }
 
 }
